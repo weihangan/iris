@@ -21,6 +21,8 @@
 - **长期记忆**：隔了几个小时、甚至更久，还记得你说过的话和最近的情况
 - **角色 Skill 蒸馏**：可自主蒸馏网上角色生成 skill，并支持后续微调，越聊越像
 
+![识图聊天与长期记忆](docs/screenshots/chat-image-recognition.png)
+
 ### 语音：克隆你的角色
 
 - **语音克隆与输出**：基于 GPT-SoVITS 进行角色语音克隆与语音输出，支持用户的语音输入
@@ -39,10 +41,9 @@
 ## 界面预览
 
 <p align="center">
-  <img src="docs/screenshots/chat-image-recognition.png" width="24%" alt="识图聊天与长期记忆" />
-  <img src="docs/screenshots/model-switch-1.png" width="24%" alt="模型切换与动作管理" />
-  <img src="docs/screenshots/model-switch-2.png" width="24%" alt="模型切换与动作管理" />
-  <img src="docs/screenshots/model-switch-3.png" width="24%" alt="模型切换与动作管理" />
+  <img src="docs/screenshots/model-switch-1.png" width="32%" alt="模型切换与动作管理" />
+  <img src="docs/screenshots/model-switch-2.png" width="32%" alt="模型切换与动作管理" />
+  <img src="docs/screenshots/model-switch-3.png" width="32%" alt="模型切换与动作管理" />
 </p>
 
 ## Windows 版本
