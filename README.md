@@ -33,6 +33,11 @@
 
 ![语音动作联动](docs/screenshots/voice-actions.gif)
 
+<p align="center">
+  <img src="docs/screenshots/voice-clone.png" width="48%" alt="语音克隆训练" />
+  <img src="docs/screenshots/voice-switch-language.png" width="48%" alt="切换语言/声音" />
+</p>
+
 ### 表演：会动的角色
 
 - **模型可切换**：内置多个角色模型，可随时一键切换，每个模型独立记忆与语音
@@ -45,6 +50,22 @@
   <img src="docs/screenshots/model-switch-1.png" width="32%" alt="模型切换与动作管理" />
   <img src="docs/screenshots/model-switch-2.png" width="32%" alt="模型切换与动作管理" />
   <img src="docs/screenshots/model-switch-3.png" width="32%" alt="模型切换与动作管理" />
+</p>
+
+## 设置
+
+### 设置功能
+
+<p align="center">
+  <img src="docs/screenshots/settings-1.png" width="48%" alt="设置功能" />
+  <img src="docs/screenshots/settings-2.png" width="48%" alt="设置功能" />
+</p>
+
+### 语言微调
+
+<p align="center">
+  <img src="docs/screenshots/voice-finetune-1.png" width="48%" alt="语言微调" />
+  <img src="docs/screenshots/voice-finetune-2.png" width="48%" alt="语言微调" />
 </p>
 
 ## Windows 版本
