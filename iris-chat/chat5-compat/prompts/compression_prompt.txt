@@ -1,0 +1,60 @@
+你负责把一个“已到压缩节点的旧对话批次”一次性整理为：
+1. 可供普通聊天连续使用的累计摘要；
+2. 只在确有用户原话证据时写入的结构化长期记忆更新。
+
+当前已有累计摘要：
+{{EXISTING_SUMMARY}}
+
+当前已有结构化记忆（避免重复）：
+{{CURRENT_MEMORY}}
+
+本次新增、尚未进入摘要节点的旧聊天批次（只整理这一批，不要重新改写上面的摘要）：
+{{CHAT_HISTORY}}
+
+真实性与取舍规则：
+1. 用户原话是用户身份、偏好、关系、共同经历、承诺与事件的主要证据。assistant 行中的邀请、场景、修辞、关系标签和情绪判断不能证明用户事实。
+2. 用户最新的明确修正优先；旧事实被纠正时放入 superseded_facts。假设、举例、引用、玩笑、否定内容不得误存为事实。
+3. 摘要保留：用户明确事实、重要偏好、关键事件、未解决事项、已确认的关系变化/边界/承诺，以及对未来接话确有帮助的情绪变化与触发原因。
+4. 摘要删除：无意义寒暄、重复套话、助手动作/布景、单方面关系升级、重复关心、表情包和语气控制标记。
+5. 短期“当前情绪”和角色当前动作/声音状态由运行时单独维护，不要用这批较旧消息覆盖；只有持续未解决的困扰才写入 recent_troubles。
+6. 合并重复项，完整 summary 不超过1200个中文字符。结构化事实尽量原子化，每条不超过80字。
+
+只输出严格 JSON，不要 Markdown 代码块，不要解释：
+{
+  "summary": "合并已有摘要与本批次后的完整累计摘要",
+  "memory_updates": {
+    "user_profile": {
+      "name": "",
+      "nickname": "",
+      "birthday": "",
+      "location": "",
+      "occupation": ""
+    },
+    "preferences": {
+      "likes": [],
+      "dislikes": [],
+      "topics": [],
+      "communication_style": ""
+    },
+    "emotional_state": {
+      "recent_troubles": []
+    },
+    "important_events": [],
+    "relationship_notes": [
+      { "note": "已确认的关系变化、边界或承诺", "evidence": "能在 user 行找到的对应原话", "confidence": 1.0 }
+    ],
+    "festival_notes": [],
+    "permanent_facts": [
+      {
+        "fact": "事实文本",
+        "category": "personal_info|family|career|health|relationship|major_event|other",
+        "confidence": 1.0,
+        "date": "YYYY-MM-DD",
+        "source": "对话中明确提及"
+      }
+    ],
+    "superseded_facts": []
+  }
+}
+
+没有更新的数组保持为空，没有更新的字符串保持为空；不要为了填满字段而推断。

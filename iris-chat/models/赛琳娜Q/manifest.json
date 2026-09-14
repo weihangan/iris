@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "packId": "selena-q-example",
+  "displayName": "赛琳娜Q（示例）",
+  "internalName": "selena-q-example",
+  "model": { "pmxFile": "赛琳娜Q.pmx", "credit": "Example asset supplied for framework development", "licenseStatus": "verify-before-redistribution" },
+  "textures": [],
+  "morphs": { "visemes": {}, "blink": "", "emotions": {} },
+  "bones": {},
+  "materialCompatibility": { "rules": [] },
+  "motions": {
+    "idlePacks": [],
+    "gesturePacks": [],
+    "defaultIdle": "../shared/motions/待机 双手后背.vmd",
+    "customVmd": [
+      "../shared/motions/待机 双手后背.vmd",
+      "../shared/motions/解释_右手轻摊一次后回正.vmd",
+      "../shared/motions/疑惑_人物左侧歪头10度_仅头部.vmd",
+      "../shared/motions/斜视瞪.vmd"
+    ],
+    "longActionVmd": [],
+    "idleVmdPool": []
+  },
+  "capabilities": []
+}

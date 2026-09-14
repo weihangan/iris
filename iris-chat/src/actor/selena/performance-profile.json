@@ -1,0 +1,26 @@
+{
+  "avatarSha256": "C8636D99356C51D059B3FC38FFF062123C57D82164A00BBEB76B40674E503DF5",
+  "relaxedBasePose": {
+    "leftShoulder": [0, 0, 0.025],
+    "rightShoulder": [0, 0, -0.05],
+    "leftArm": [0, 0, 0.12],
+    "rightArm": [0, 0, -0.15],
+    "leftElbow": [0, -0.08, 0],
+    "rightElbow": [0, 0.11, 0],
+    "leftWrist": [0, 0, 0.04],
+    "rightWrist": [0, 0, -0.07]
+  },
+  "proceduralLife": {
+    "breathPrimaryRadians": 0.006,
+    "breathSecondaryRadians": 0.002,
+    "swayRadians": 0.008,
+    "speakingScale": 0.7,
+    "blinkIntervalMinSeconds": 3.2,
+    "blinkIntervalMaxSeconds": 5.4
+  },
+  "idleDirector": {
+    "minDwellSeconds": 25,
+    "maxDwellSeconds": 70,
+    "recentHistorySize": 2
+  }
+}

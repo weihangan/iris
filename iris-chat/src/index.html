@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iris-chat</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --surface: #161a21;
+      --surface-2: #1b202a;
+      --border: #262c38;
+      --border-soft: #20252f;
+      --text: #e6e9ef;
+      --text-dim: #8b93a3;
+      --text-faint: #5f6674;
+      --accent: #07c160;
+      --accent-deep: #06ad56;
+      --accent-soft: rgba(7, 193, 96, 0.14);
+      --blue: #59a6ff;
+      --danger: #ff6b6b;
+      --radius: 10px;
+      --radius-sm: 6px;
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      background: var(--bg);
+      background-image:
+        radial-gradient(1200px 500px at 70% -10%, rgba(89, 166, 255, 0.05), transparent 60%),
+        radial-gradient(900px 420px at 10% 110%, rgba(7, 193, 96, 0.04), transparent 60%);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      padding: 13px 20px;
+      background: rgba(22, 26, 33, 0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      background: linear-gradient(90deg, #e6e9ef, #9fd4b8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    header .identity { font-size: 11px; color: var(--text-faint); }
+    header .header-actions { display: flex; gap: 10px; align-items: center; }
+    header .header-btn {
+      padding: 5px 12px;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    }
+    header .header-btn:hover { background: #232937; border-color: #323a4a; }
+    header .header-btn:active { transform: scale(0.97); }
+    header .header-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    main {
+      flex: 1;
+      padding: 20px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: #2c3340 transparent;
+    }
+    main::-webkit-scrollbar { width: 8px; }
+    main::-webkit-scrollbar-track { background: transparent; }
+    main::-webkit-scrollbar-thumb {
+      background: #2c3340;
+      border-radius: 4px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+    main::-webkit-scrollbar-thumb:hover { background: #3a4353; background-clip: padding-box; }
+    .placeholder {
+      padding: 48px 40px;
+      text-align: center;
+      color: var(--text-faint);
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+    footer {
+      padding: 12px 20px 14px;
+      background: rgba(22, 26, 33, 0.85);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border-soft);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    footer > input[type="text"] {
+      flex: 1;
+      padding: 9px 14px;
+      background: #12151c;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text);
+      font-size: 14px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    footer > input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    footer > input[type="text"]::placeholder { color: var(--text-faint); }
+    .transition-speed-control {
+      display: grid;
+      grid-template-columns: auto 92px auto;
+      align-items: center;
+      gap: 5px;
+      min-width: 174px;
+      color: var(--text-dim);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .transition-speed-control input[type="range"] {
+      width: 92px;
+      margin: 0;
+      accent-color: var(--blue);
+    }
+    .transition-speed-control output {
+      min-width: 30px;
+      color: #dbe8ff;
+      text-align: right;
+    }
+    footer button {
+      padding: 9px 18px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+      color: white;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 2px 10px rgba(7, 193, 96, 0.25);
+      transition: filter 0.15s, transform 0.1s, box-shadow 0.15s;
+    }
+    footer button:hover { filter: brightness(1.08); box-shadow: 0 3px 14px rgba(7, 193, 96, 0.35); }
+    footer button:active { transform: scale(0.97); }
+    .voice-input-btn {
+      width: 38px;
+      padding: 8px 0;
+      background: var(--surface-2) !important;
+      color: #d5dae3 !important;
+      font-size: 16px;
+      line-height: 1;
+      border: 1px solid var(--border) !important;
+      border-radius: 999px !important;
+      box-shadow: none !important;
+    }
+    .voice-input-btn:hover { background: #232937 !important; }
+    .voice-input-btn.listening {
+      background: #c54242 !important;
+      color: #fff !important;
+      border-color: #d96060 !important;
+      animation: voice-input-pulse 1s ease-in-out infinite;
+    }
+    .voice-input-btn.transcribing { color: #7db7ff !important; }
+    @keyframes voice-input-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.62; }
+    }
+    /* 消息气泡 */
+    .msg {
+      max-width: 72%;
+      width: fit-content;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+      animation: msg-in 0.18s ease-out;
+    }
+    @keyframes msg-in {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .msg.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #1d4d33, #173f2b);
+      border: 1px solid rgba(7, 193, 96, 0.22);
+      border-bottom-right-radius: 4px;
+      color: #d9f5e4;
+    }
+    .msg.assistant {
+      align-self: flex-start;
+      background: var(--surface-2);
+      border: 1px solid var(--border-soft);
+      border-bottom-left-radius: 4px;
+      color: var(--text);
+    }
+    .msg.system {
+      align-self: center;
+      background: transparent;
+      color: var(--text-faint);
+      font-style: italic;
+      font-size: 12px;
+      padding: 4px 12px;
+    }
+    .msg.mock {
+      background: #4a3a1a;
+      border: 1px solid #ffa500;
+      color: #ffd080;
+    }
+    #mock-badge {
+      display: none;
+      padding: 2px 8px;
+      background: #ffa500;
+      color: #000;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    /* 模型管理面板（Phase 5.2） */
+    #model-panel {
+      position: fixed;
+      top: 56px;
+      right: 20px;
+      width: 360px;
+      max-height: 80vh;
+      overflow-y: auto;
+      background: rgba(22, 26, 33, 0.96);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      z-index: 1000;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+      color: var(--text);
+      font-size: 13px;
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: #2c3340 transparent;
+    }
+    #model-panel::-webkit-scrollbar { width: 8px; }
+    #model-panel::-webkit-scrollbar-track { background: transparent; }
+    #model-panel::-webkit-scrollbar-thumb { background: #2c3340; border-radius: 4px; }
+    #model-panel h2 {
+      margin: 0 0 12px 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.3px;
+    }
+    #model-panel .panel-section {
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    #model-panel .panel-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    #model-panel .section-title {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+    }
+    #model-panel #model-select {
+      width: 100%;
+      padding: 7px 10px;
+      background: #12151c;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin-bottom: 6px;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+    #model-panel #model-select:focus { outline: none; border-color: var(--accent); }
+    #model-panel #current-model-info {
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    #model-panel .pack-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+      font-size: 12px;
+      color: var(--text);
+    }
+    #model-panel .pack-item label {
+      cursor: pointer;
+      flex: 1;
+      word-break: break-all;
+    }
+    #model-panel .pack-item input[type="checkbox"],
+    #model-panel .pack-item input[type="radio"] {
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+    #model-panel .pack-item .default-tag {
+      font-size: 11px;
+      color: var(--text-dim);
+      cursor: pointer;
+      user-select: none;
+    }
+    #model-panel .vmd-item {
+      padding: 4px 0;
+      font-size: 12px;
+      color: #c0c6d2;
+      word-break: break-all;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #model-panel .vmd-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-right: 8px;
+    }
+    #model-panel .vmd-play-btn {
+      padding: 3px 10px;
+      background: #1d3a2b;
+      color: #7fd4a0;
+      border: 1px solid #2b5a41;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 11px;
+      flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    #model-panel .vmd-play-btn:hover {
+      background: #254a35;
+      border-color: #34684c;
+    }
+    #model-panel .vmd-play-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    #model-panel .vmd-default-btn {
+      padding: 3px 10px;
+      background: var(--surface-2);
+      color: #c0c6d2;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 11px;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    #model-panel .vmd-default-btn:hover {
+      background: #232937;
+    }
+    #model-panel .vmd-default-btn.active {
+      background: #3d3421;
+      color: #f0c060;
+      border-color: #6a5a3a;
+      cursor: default;
+    }
+    #model-panel .vmd-default-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    #model-panel .vmd-empty {
+      font-size: 11px;
+      color: var(--text-faint);
+      font-style: italic;
+    }
+    #model-panel #vmd-search {
+      width: 100%;
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #12151c;
+      color: var(--text);
+      font-size: 12px;
+      box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+    #model-panel #vmd-search:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+    #model-panel .vmd-category-block {
+      margin-bottom: 4px;
+    }
+    #model-panel .vmd-category-header {
+      font-size: 11px;
+      font-weight: bold;
+      border-bottom: 1px solid var(--border-soft);
+      padding-bottom: 3px;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #model-panel .vmd-category-count {
+      font-weight: normal;
+      font-size: 10px;
+      color: var(--text-faint);
+    }
+    #model-panel .vmd-category-scroll {
+      max-height: 160px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: #2c3340 transparent;
+    }
+    #model-panel .vmd-category-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    #model-panel .vmd-category-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #model-panel .vmd-category-scroll::-webkit-scrollbar-thumb {
+      background: #2c3340;
+      border-radius: 3px;
+    }
+    #model-panel .vmd-category-scroll::-webkit-scrollbar-thumb:hover {
+      background: #3a4353;
+    }
+    #model-panel .vmd-duration {
+      color: #5a6a7a;
+      font-size: 10px;
+      flex-shrink: 0;
+    }
+    /* 语音动作样式 */
+    #model-panel .voice-emotion-group {
+      margin-bottom: 4px;
+    }
+    #model-panel .voice-emotion-header {
+      font-size: 12px;
+      font-weight: bold;
+      color: #c9b0dc;
+      padding: 4px 8px;
+      background: #20203a;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+    }
+    #model-panel .voice-emotion-header:hover {
+      background: #2a2a48;
+    }
+    #model-panel .voice-emotion-items {
+      padding-left: 8px;
+      display: none;
+    }
+    #model-panel .voice-emotion-items.open {
+      display: block;
+    }
+    #model-panel .voice-action-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 6px;
+      font-size: 11px;
+      color: #aab2c2;
+      border-radius: 4px;
+    }
+    #model-panel .voice-action-item:hover {
+      background: #232937;
+    }
+    #model-panel .voice-action-name {
+      flex: 1;
+      color: #ccd2de;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    #model-panel .voice-action-emotions {
+      color: #7d8493;
+      font-size: 10px;
+      flex-shrink: 0;
+    }
+    #model-panel .voice-action-preview {
+      cursor: pointer;
+      color: #6a8ab0;
+      font-size: 10px;
+      padding: 0 3px;
+      flex-shrink: 0;
+    }
+    #model-panel .voice-action-preview:hover {
+      color: #8ab0d0;
+    }
+    #model-panel .candidate-review-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    #model-panel .candidate-review-row {
+      padding: 9px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #141822;
+      transition: border-color 0.15s;
+    }
+    #model-panel .candidate-review-row:hover { border-color: #323a4a; }
+    #model-panel .candidate-review-name {
+      color: #e4e7ef;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    #model-panel .candidate-review-meta {
+      color: #8f96a5;
+      font-size: 10px;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+    #model-panel .candidate-review-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 7px;
+    }
+    #model-panel .candidate-review-actions button {
+      padding: 3px 8px;
+      color: #cbd3e1;
+      background: #252a36;
+      border: 1px solid #3b4252;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 10px;
+      transition: background 0.15s;
+    }
+    #model-panel .candidate-review-actions button:hover { background: #333a49; }
+    #model-panel .candidate-review-actions button.candidate-accept {
+      color: #9ed7ad;
+      border-color: #3f6850;
+    }
+    #model-panel .candidate-review-actions button.candidate-delete {
+      color: #d39b9b;
+      border-color: #684545;
+    }
+    #model-panel #import-vmd-btn,
+    #model-panel #close-panel-btn {
+      padding: 7px 14px;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.15s;
+    }
+    #model-panel #import-vmd-btn:hover,
+    #model-panel #close-panel-btn:hover {
+      background: #232937;
+    }
+    #model-panel #import-vmd-btn:disabled,
+    #model-panel #close-panel-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    #model-panel .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 0;
+      font-size: 12px;
+      color: var(--text);
+    }
+    #model-panel .toggle-row input[type="checkbox"] {
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+    #model-panel .toggle-row label {
+      cursor: pointer;
+      flex: 1;
+    }
+    #model-panel .panel-footer {
+      margin-top: 10px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>iris-chat</h1>
+    <div class="header-actions">
+      <span id="mock-badge"></span>
+      <button id="select-model-btn" class="header-btn" title="选择本地 PMX 模型文件（须 SHA-256 匹配）">选择模型</button>
+      <button id="model-manager-btn" class="header-btn" title="打开模型管理面板">模型管理</button>
+      <span class="identity" id="identity">加载中...</span>
+    </div>
+  </header>
+  <main id="messages">
+    <div class="placeholder">ChatX2 已启动。输入消息开始对话。</div>
+  </main>
+  <footer>
+    <label class="transition-speed-control" for="transition-speed" title="调低会延长收势和入势；调高会缩短动作衔接">
+      <span>衔接</span>
+      <input id="transition-speed" type="range" min="0.5" max="1.8" step="0.05" value="0.7" />
+      <output id="transition-speed-value">慢</output>
+    </label>
+    <input id="input" type="text" placeholder="输入消息..." />
+    <button id="voice-input-btn" class="voice-input-btn" type="button" title="开始本地语音输入（最长30秒）" aria-label="开始本地语音输入（最长30秒）">🎙</button>
+    <button id="send">发送</button>
+  </footer>
+  <div id="model-panel" style="display:none;">
+    <h2>模型管理</h2>
+    <div class="panel-section">
+      <div class="section-title">当前模型</div>
+      <select id="model-select"></select>
+      <div id="current-model-info">加载中...</div>
+    </div>
+    <div class="panel-section">
+      <div class="section-title">待机动作（idle）</div>
+      <div id="idle-packs-list">
+        <div class="vmd-empty">加载中...</div>
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="section-title">手势动作（gesture）</div>
+      <div id="gesture-packs-list">
+        <div class="vmd-empty">加载中...</div>
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="section-title">自定义动作（VMD）<span id="vmd-count" style="font-weight:normal;color:#888;font-size:12px;margin-left:8px;"></span></div>
+      <input type="text" id="vmd-search" placeholder="搜索 VMD 动作..." style="width:100%;margin-bottom:6px;padding:4px 8px;border:1px solid #555;border-radius:4px;background:#2a2a3a;color:#ddd;font-size:12px;" />
+      <div id="custom-vmd-list">
+        <div id="vmd-category-short" class="vmd-category-block">
+          <div class="vmd-category-header" style="color:#a0d0a0;">短动作 (≤3秒) <span class="vmd-category-count">0</span></div>
+          <div class="vmd-category-scroll"></div>
+        </div>
+        <div id="vmd-category-medium" class="vmd-category-block">
+          <div class="vmd-category-header" style="color:#a0c0d0;">中动作 (3-8秒) <span class="vmd-category-count">0</span></div>
+          <div class="vmd-category-scroll"></div>
+        </div>
+        <div id="vmd-category-long" class="vmd-category-block">
+          <div class="vmd-category-header" style="color:#d0a0c0;">长动作 (>8秒) <span class="vmd-category-count">0</span></div>
+          <div class="vmd-category-scroll"></div>
+        </div>
+        <div id="vmd-empty-hint" class="vmd-empty" style="display:none;"></div>
+      </div>
+      <div style="margin-top:6px;">
+        <button id="import-vmd-btn" type="button">导入 VMD</button>
+      </div>
+    </div>
+    <section id="external-vmd-candidate-review" class="panel-section">
+      <div class="section-title">VMD 备选池（项目外）<span id="external-vmd-count" style="font-weight:normal;color:#888;font-size:12px;margin-left:8px;"></span></div>
+      <div class="voice-action-hint" style="color:#888;font-size:11px;margin-bottom:6px;">读取 D:\\trae\\vmd-candidates-20260829；这里只预览和筛选，加入后才复制到共享动作池。</div>
+      <div id="external-vmd-candidate-list" class="candidate-review-list">
+        <div class="vmd-empty">加载中...</div>
+      </div>
+    </section>
+    <div class="panel-section">
+      <div class="section-title">语音动作池<span id="voice-action-count" style="font-weight:normal;color:#888;font-size:12px;margin-left:8px;"></span></div>
+      <div class="voice-action-hint" style="color:#888;font-size:11px;margin-bottom:6px;">所有模型共享，按情绪分类。点击 ▶ 预览动作。只有已加入语音池且显示“语音✓”的动作会被语音 Planner 自动选用。</div>
+      <div id="voice-actions-list">
+        <div class="vmd-empty">加载中...</div>
+      </div>
+    </div>
+    <section id="motion-candidate-review" class="panel-section">
+      <div class="section-title">新添加 调试用—语音动作</div>
+      <div class="voice-action-hint" style="color:#888;font-size:11px;margin-bottom:6px;">仅供真实模型手动预览；预览不会加入正式语音动作池。</div>
+      <div id="motion-candidate-list" class="candidate-review-list">
+        <div class="vmd-empty">加载中...</div>
+      </div>
+    </section>
+    <section id="expression-candidate-review" class="panel-section">
+      <div class="section-title">新添加 调试用—表情</div>
+      <div class="voice-action-hint" style="color:#888;font-size:11px;margin-bottom:6px;">表情与动作独立接受；预览不会启用自动表情。</div>
+      <div id="expression-candidate-list" class="candidate-review-list">
+        <div class="vmd-empty">加载中...</div>
+      </div>
+    </section>
+    <div class="panel-section">
+      <div class="section-title">显示设置</div>
+      <div class="toggle-row">
+        <input type="checkbox" id="model-enabled-toggle" checked />
+        <label for="model-enabled-toggle">启用 3D 模型（关闭后只显示输入框）</label>
+      </div>
+      <div class="toggle-row">
+        <input type="checkbox" id="voice-history-toggle" />
+        <label for="voice-history-toggle">历史记录带语音播放</label>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button id="close-panel-btn" type="button">关闭</button>
+    </div>
+  </div>
+  <script type="module" src="./renderer.ts"></script>
+</body>
+</html>

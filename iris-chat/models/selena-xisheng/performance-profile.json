@@ -1,0 +1,9 @@
+{
+  "profileVersion": 1,
+  "modelId": "generic",
+  "visemes": {},
+  "expressions": {},
+  "facialChannels": {},
+  "gaze": { "supported": false },
+  "conversationMotionIds": []
+}

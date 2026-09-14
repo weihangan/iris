@@ -1,0 +1,26 @@
+{
+  "version": "voice-identity-lock-v2",
+  "identityEmotion": "gentle",
+  "sampling": {
+    "temperature": 0.62,
+    "topP": 0.8
+  },
+  "limits": {
+    "speed": [0.92, 1.08],
+    "speedOffset": [-0.06, 0.06],
+    "pitchOffset": [-1.0, 1.0],
+    "temperatureOffset": [-0.03, 0.03],
+    "softOffset": [-0.25, 0.35],
+    "volumeOffset": [-0.25, 0.25]
+  },
+  "emotionProsody": {
+    "gentle": { "speed": 0.99, "pitchSemitones": 0.0, "energy": 0.98 },
+    "comfort": { "speed": 0.96, "pitchSemitones": 0.0, "energy": 0.96 },
+    "sad": { "speed": 0.94, "pitchSemitones": 0.0, "energy": 0.92 },
+    "sad_question": { "speed": 0.95, "pitchSemitones": 0.0, "energy": 0.94 },
+    "question": { "speed": 0.98, "pitchSemitones": 0.0, "energy": 0.98 },
+    "strong": { "speed": 0.97, "pitchSemitones": 0.0, "energy": 1.04 },
+    "excited": { "speed": 1.06, "pitchSemitones": 0.0, "energy": 1.05 },
+    "shy_happy": { "speed": 0.97, "pitchSemitones": 0.0, "energy": 0.96 }
+  }
+}

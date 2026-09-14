@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>语音克隆训练</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    margin:0; min-height:100vh; overflow-y:auto;
+    background: linear-gradient(160deg, #14101f 0%, #0d0a18 100%);
+    color: var(--text-primary, #f0f0ff);
+  }
+  .vt-wrap {
+    max-width: 760px; margin: 0 auto; padding: 32px 20px 120px;
+    color: var(--text-primary, #f0f0ff);
+  }
+  .vt-title {
+    font-size: 24px; font-weight: 600; margin-bottom: 6px;
+    display:flex; align-items:center; gap:10px;
+    color: #f5f5ff;
+  }
+  .vt-sub { font-size: 13px; color: rgba(220,220,255,0.78); margin-bottom: 28px; }
+
+  /* 顶部工具栏 */
+  .vt-toolbar {
+    display:flex; align-items:center; gap:12px; margin-bottom:24px;
+    padding:10px 14px; background:rgba(255,255,255,0.08);
+    border-radius:10px; border:1px solid rgba(255,255,255,0.15);
+  }
+  .vt-toolbar-label { font-size:12px; color:rgba(220,220,255,0.75); }
+  .vt-zoom-btns { display:flex; gap:4px; }
+  .vt-zoom-btn {
+    width:28px; height:28px; border-radius:6px; border:1px solid rgba(255,255,255,0.2);
+    background:rgba(255,255,255,0.1); color:#f0f0ff;
+    font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:all 0.15s;
+  }
+  .vt-zoom-btn:hover { background:rgba(255,255,255,0.18); border-color:rgba(255,255,255,0.35); }
+  .vt-zoom-level { font-size:13px; font-weight:600; min-width:44px; text-align:center; color:#f0f0ff; }
+
+  .vt-card {
+    background: rgba(30, 27, 50, 0.72);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 16px; padding: 24px; margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .vt-card h3 { margin:0 0 14px; font-size:16px; font-weight:600; display:flex; align-items:center; gap:8px; color:#f5f5ff; }
+  .vt-step-num {
+    width:24px; height:24px; border-radius:50%;
+    background: var(--accent, #a78bfa); color:#fff;
+    font-size:13px; display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .vt-step-num.done { background: #4ade80; }
+  .vt-step-num.active { background: var(--accent, #a78bfa); box-shadow: 0 0 10px var(--accent-glow, rgba(167,139,250,0.5)); }
+  .vt-step-num.locked { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); }
+
+  /* 通用输入框/按钮 — 增强可读性 */
+  .vt-input-base, .vt-path-row input, #vt-voice-name, #vt-local-dir {
+    color: #f0f0ff !important;
+    background: rgba(255,255,255,0.08) !important;
+    border:1px solid rgba(255,255,255,0.18) !important;
+  }
+  .vt-input-base::placeholder, .vt-path-row input::placeholder, #vt-voice-name::placeholder, #vt-local-dir::placeholder {
+    color: rgba(220,220,255,0.45);
+  }
+  .vt-input-base:focus, .vt-path-row input:focus, #vt-voice-name:focus, #vt-local-dir:focus {
+    border-color: var(--accent, #a78bfa) !important;
+    box-shadow: 0 0 0 3px var(--accent-glow, rgba(167,139,250,0.2));
+    outline: none;
+  }
+
+  /* MP3 上传 */
+  .vt-upload-zone {
+    border: 2px dashed rgba(255,255,255,0.28); border-radius:14px;
+    padding: 36px 20px; text-align:center; cursor:pointer;
+    transition: all 0.2s;
+    color: #f0f0ff;
+    background: rgba(255,255,255,0.04);
+  }
+  .vt-upload-zone:hover { border-color: var(--accent, #a78bfa); background: rgba(167,139,250,0.1); }
+  .vt-upload-zone.dragover { border-color: var(--accent, #a78bfa); background: rgba(167,139,250,0.16); }
+  .vt-upload-zone svg { opacity:0.85; margin-bottom:8px; }
+  .vt-upload-hint { font-size:13px; color: rgba(220,220,255,0.78); margin-top:6px; }
+  .vt-file-list { margin-top:14px; }
+  .vt-file-item {
+    display:flex; align-items:center; gap:10px; padding:8px 12px;
+    background: rgba(255,255,255,0.08); border-radius:8px; margin-bottom:6px; font-size:13px;
+    color: #f0f0ff;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .vt-file-item .vt-file-del { margin-left:auto; cursor:pointer; color:rgba(255,140,140,0.95); }
+  .vt-file-size { color: rgba(220,220,255,0.7); font-size:11px; }
+
+  /* 已有语音管理列表 */
+  .vt-voice-row {
+    display:flex; align-items:center; gap:8px;
+    padding:8px 12px; margin-bottom:6px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius:8px;
+  }
+  .vt-voice-name { flex:1; font-size:13px; color:#f0f0ff; word-break:break-all; }
+  .vt-voice-tag { font-size:11px; color:rgba(220,220,255,0.5); }
+  .vt-voice-btn {
+    padding:4px 10px; border:1px solid rgba(255,255,255,0.2);
+    background:rgba(255,255,255,0.08); color:#f0f0ff;
+    font-size:11px; border-radius:6px; cursor:pointer; transition:all 0.15s;
+    white-space:nowrap;
+  }
+  .vt-voice-btn:hover { background:rgba(255,255,255,0.16); }
+  .vt-voice-btn.vt-voice-delete { color:#ff8585; border-color:rgba(255,140,140,0.3); }
+  .vt-voice-btn.vt-voice-delete:hover { background:rgba(255,140,140,0.12); border-color:rgba(255,140,140,0.5); }
+
+  /* 路径配置 */
+  .vt-path-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .vt-path-row label { width:130px; font-size:13px; flex-shrink:0; color: rgba(220,220,255,0.85); }
+  .vt-path-row input {
+    flex:1; padding:8px 12px; border-radius:8px;
+    background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18);
+    color: var(--text-primary, rgba(240,240,255,0.95)); font-size:13px;
+  }
+  .vt-path-status { font-size:11px; margin-left:8px; }
+  .vt-path-ok { color:#4ade80; }
+  .vt-path-err { color:#f87171; }
+
+  /* 开始按钮 */
+  .vt-start-btn {
+    width:100%; padding:14px; border:none; border-radius:12px;
+    background: var(--accent, #a78bfa); color:#fff;
+    font-size:16px; font-weight:600; cursor:pointer;
+    transition: all 0.2s;
+  }
+  .vt-start-btn:hover { filter:brightness(1.1); box-shadow:0 4px 16px var(--accent-glow, rgba(167,139,250,0.4)); }
+  .vt-start-btn:disabled { opacity:0.4; cursor:not-allowed; filter:none; box-shadow:none; }
+
+  /* 进度 - 全新设计 */
+  .vt-progress-wrap { margin-top:8px; display:none; }
+  .vt-progress-wrap.active { display:block; }
+
+  /* 多级进度条 */
+  .vt-stage-list { margin-bottom:16px; }
+  .vt-stage-item {
+    display:flex; align-items:center; gap:10px; margin-bottom:8px;
+    font-size:13px; color: rgba(220,220,255,0.88);
+  }
+  .vt-stage-dot {
+    width:8px; height:8px; border-radius:50%; flex-shrink:0;
+    background: rgba(255,255,255,0.3);
+  }
+  .vt-stage-item.active .vt-stage-dot { background: var(--accent, #a78bfa); box-shadow:0 0 6px var(--accent-glow,rgba(167,139,250,0.6)); }
+  .vt-stage-item.done .vt-stage-dot { background: #4ade80; }
+  .vt-stage-item.err .vt-stage-dot { background: #f87171; }
+  .vt-stage-name { flex:1; }
+
+  /* 实时日志 */
+  .vt-log-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:8px;
+  }
+  .vt-log-title { font-size:12px; color:rgba(220,220,255,0.78); }
+  .vt-heartbeat {
+    display:flex; align-items:center; gap:5px; font-size:11px;
+    color: rgba(220,220,255,0.65);
+  }
+  .vt-heartbeat-dot {
+    width:6px; height:6px; border-radius:50%; background:#4ade80;
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+  .vt-heartbeat-dot.dead { background:#f87171; animation:none; }
+  @keyframes heartbeat {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.5; transform:scale(0.8); }
+  }
+  .vt-log-box {
+    max-height:280px; overflow-y:auto;
+    background: rgba(0,0,0,0.5); border-radius:10px; padding:12px;
+    font-family: 'Consolas','Monaco',monospace; font-size:12px; line-height:1.7;
+    color: rgba(230,230,255,0.92);
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .vt-log-line { margin-bottom:1px; word-break:break-all; }
+  .vt-log-line.err { color:#ff8585; }
+  .vt-log-line.ok { color:#5be084; }
+  .vt-log-line .vt-log-stage { color: var(--accent, #a78bfa); font-weight:600; }
+  .vt-log-time { color: rgba(255,255,255,0.45); margin-right:6px; font-size:11px; }
+  .vt-log-running { color: #fbbf24; }
+  .vt-done-msg {
+    margin-top:14px; padding:14px; border-radius:10px;
+    background: rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.3);
+    color:#4ade80; font-size:14px; display:none;
+  }
+  .vt-done-msg.show { display:block; }
+  .vt-desktop-warn { display:none; text-align:center; padding:60px 20px; color:var(--text-secondary,rgba(220,220,255,0.5)); }
+  @media (max-width: 768px) {
+    .vt-wrap { display:none; }
+    .vt-desktop-warn { display:block; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-layer" id="bg-layer"></div>
+
+<div class="vt-desktop-warn">
+  <h2>语音训练工具仅限电脑端使用</h2>
+  <p>请在电脑浏览器中打开此页面</p>
+</div>
+
+<div class="vt-wrap" id="vt-wrap">
+  <div class="vt-title">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+    语音克隆训练
+  </div>
+  <div class="vt-sub" id="vt-sub-estimate">上传音频 → 自动人声分离、切片、训练、部署。</div>
+
+  <!-- 顶部工具栏 -->
+  <div class="vt-toolbar">
+    <span class="vt-toolbar-label">页面缩放</span>
+    <div class="vt-zoom-btns">
+      <button class="vt-zoom-btn" id="vt-zoom-out" title="缩小">−</button>
+      <span class="vt-zoom-level" id="vt-zoom-level">100%</span>
+      <button class="vt-zoom-btn" id="vt-zoom-in" title="放大">+</button>
+      <button class="vt-zoom-btn" id="vt-zoom-reset" title="重置">⟳</button>
+    </div>
+  </div>
+
+  <!-- 步骤1: 给语音起名 -->
+  <div class="vt-card" id="vt-card-char">
+    <h3><span class="vt-step-num active" id="vt-num-char">1</span>给语音起个名字</h3>
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;">
+      <input type="text" id="vt-voice-name" placeholder="输入语音名称（如：温柔少女、少年音）" style="flex:1;padding:10px 14px;border-radius:10px;">
+      <button id="vt-check-name-btn" style="padding:10px 16px;border:none;border-radius:10px;background:var(--accent,#a78bfa);color:#fff;font-size:13px;cursor:pointer;white-space:nowrap;">检查重名</button>
+    </div>
+    <div id="vt-name-status" style="font-size:12px;min-height:18px;"></div>
+    <div id="vt-existing-voices" style="margin-top:12px;"></div>
+  </div>
+
+  <!-- 步骤2: 上传MP3 -->
+  <div class="vt-card" id="vt-card-upload" style="opacity:0.5;pointer-events:none;">
+    <h3><span class="vt-step-num locked" id="vt-num-upload">2</span>上传音频/视频文件</h3>
+    <div class="vt-upload-zone" id="vt-upload-zone">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <div>点击选择或拖拽音频/视频文件到此处</div>
+      <div class="vt-upload-hint">支持音频 (mp3/wav/m4a/flac) 和视频 (mp4/avi/mkv/mov/webm) 混合上传，可多选。多个文件会自动合并为单一音频再训练。可多次点击追加不同文件夹的文件。若含 metadata.json + seg_*.wav 切片文件则自动跳过分离和标注。</div>
+    </div>
+    <input type="file" id="vt-file-input" accept=".mp3,.wav,.m4a,.flac,.json,.mp4,.avi,.mkv,.mov,.webm" multiple style="display:none;">
+    <div class="vt-file-list" id="vt-file-list"></div>
+    <!-- 直接指定本地目录选项 -->
+    <div style="margin-top:14px; padding:12px; background:rgba(167,139,250,0.1); border-radius:10px; border:1px solid rgba(167,139,250,0.25);">
+      <div style="font-size:13px; margin-bottom:8px; color:rgba(220,220,255,0.88);">或直接指定本地音频或视频目录（适合大量素材，无需上传，目录内视频和音频会自动合并为单一音频）：</div>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="vt-local-dir" placeholder="输入本地音频或视频目录的完整路径" style="flex:1; padding:8px 12px; border-radius:8px; font-size:13px;">
+        <button id="vt-use-dir-btn" style="padding:8px 16px; border:none; border-radius:8px; background:var(--accent,#a78bfa); color:#fff; font-size:13px; cursor:pointer; white-space:nowrap;">使用此目录</button>
+      </div>
+      <div id="vt-dir-status" style="font-size:11px; margin-top:6px;"></div>
+    </div>
+  </div>
+
+  <!-- 步骤3: 路径配置（自动检测，可手动调整） -->
+  <div class="vt-card" id="vt-card-paths" style="opacity:0.5;pointer-events:none;">
+    <h3><span class="vt-step-num locked" id="vt-num-paths">3</span>环境路径（自动检测）</h3>
+    <div class="vt-path-row">
+      <label>GPT-SoVITS</label>
+      <input type="text" id="vt-path-gpt" placeholder="自动检测中...">
+      <span class="vt-path-status" id="vt-status-gpt"></span>
+    </div>
+    <div class="vt-path-row">
+      <label>训练工具链</label>
+      <input type="text" id="vt-path-vc" placeholder="自动检测中...">
+      <span class="vt-path-status" id="vt-status-vc"></span>
+    </div>
+    <div id="vt-preflight-status" style="margin-top:10px;padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.55;color:rgba(220,220,255,0.78);background:rgba(15,18,28,0.35);"></div>
+  </div>
+
+  <!-- 步骤4: 开始训练 -->
+  <div class="vt-card" id="vt-card-run" style="opacity:0.5;pointer-events:none;">
+    <h3><span class="vt-step-num locked" id="vt-num-run">4</span>开始训练</h3>
+    <div style="margin-bottom:12px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <label style="font-size:13px; color:rgba(220,220,255,0.88);">处理器：</label>
+      <select id="vt-device" style="padding:8px 12px; border-radius:8px; border:1px solid rgba(167,139,250,0.3); background:rgba(15,18,28,0.6); color:#fff; font-size:13px; cursor:pointer;">
+        <option value="auto" selected>自动（优先GPU，Whisper用CPU避免死锁）</option>
+        <option value="gpu">GPU（全用显卡，最快，Whisper可能死锁）</option>
+        <option value="cpu">CPU（全用处理器，最稳定，较慢）</option>
+      </select>
+      <span id="vt-estimate" style="font-size:12px; color:rgba(255,200,80,0.85); padding:4px 10px; background:rgba(255,200,80,0.08); border-radius:6px; border:1px solid rgba(255,200,80,0.2);"></span>
+    </div>
+    <button class="vt-start-btn" id="vt-start-btn" disabled>请先完成上方步骤</button>
+    <!-- 训练控制按钮（训练中显示） -->
+    <div id="vt-control-btns" style="display:none; margin-top:8px; gap:8px; display:flex; flex-wrap:wrap;">
+      <button class="vt-ctrl-btn vt-pause-btn" id="vt-pause-btn" style="padding:8px 16px; border-radius:8px; border:1px solid rgba(255,200,80,0.4); background:rgba(255,200,80,0.12); color:#ffcc66; cursor:pointer; font-size:13px;">暂停进程</button>
+      <button class="vt-ctrl-btn vt-resume-btn" id="vt-resume-btn" style="display:none; padding:8px 16px; border-radius:8px; border:1px solid rgba(100,220,150,0.4); background:rgba(100,220,150,0.12); color:#66dd99; cursor:pointer; font-size:13px;">继续进程</button>
+      <button class="vt-ctrl-btn vt-delete-btn" id="vt-delete-btn" style="padding:8px 16px; border-radius:8px; border:1px solid rgba(255,100,100,0.4); background:rgba(255,100,100,0.12); color:#ff6666; cursor:pointer; font-size:13px;">删除未完成进程</button>
+    </div>
+    <!-- 未完成进程列表（页面加载时显示） -->
+    <div id="vt-jobs-list" style="display:none; margin-top:10px;"></div>
+    <div class="vt-progress-wrap" id="vt-progress-wrap">
+      <!-- 多级阶段进度（绿灯指示，不显示百分比） -->
+      <div class="vt-stage-list" id="vt-stage-list">
+        <div class="vt-stage-item" data-stage="separate"><span class="vt-stage-dot"></span><span class="vt-stage-name">人声分离</span></div>
+        <div class="vt-stage-item" data-stage="segment"><span class="vt-stage-dot"></span><span class="vt-stage-name">切片标注</span></div>
+        <div class="vt-stage-item" data-stage="dataset"><span class="vt-stage-dot"></span><span class="vt-stage-name">数据集准备</span></div>
+        <div class="vt-stage-item" data-stage="gpt_prepare"><span class="vt-stage-dot"></span><span class="vt-stage-name">格式转换</span></div>
+        <div class="vt-stage-item" data-stage="train"><span class="vt-stage-dot"></span><span class="vt-stage-name">模型训练</span></div>
+        <div class="vt-stage-item" data-stage="refs"><span class="vt-stage-dot"></span><span class="vt-stage-name">情感参考音</span></div>
+        <div class="vt-stage-item" data-stage="deploy"><span class="vt-stage-dot"></span><span class="vt-stage-name">部署上线</span></div>
+      </div>
+      <!-- 日志区 -->
+      <div class="vt-log-header">
+        <span class="vt-log-title">运行日志</span>
+        <div class="vt-heartbeat">
+          <span class="vt-heartbeat-dot" id="vt-heartbeat"></span>
+          <span id="vt-heartbeat-text">等待开始</span>
+        </div>
+      </div>
+      <div class="vt-log-box" id="vt-log-box"></div>
+      <div class="vt-done-msg" id="vt-done-msg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ========== 状态 ==========
+  let voiceName = null;       // 用户输入的语音名称
+  let nameChecked = false;    // 是否已通过重名检查
+  let uploadedFiles = []; // {file, path}
+  let pathsOk = { gpt: false, vc: false };
+  let preflightOk = false;
+  let preflightTimer = null;
+  let training = false;
+  let currentZoom = 100;
+  let lastEventTime = 0; // 心跳检测
+  let heartbeatTimer = null;
+  let currentJobId = null;  // 当前训练任务 ID
+
+  const $ = id => document.getElementById(id);
+
+  // ========== 缩放控制 ==========
+  function applyZoom(z) {
+    currentZoom = Math.max(50, Math.min(200, z));
+    const wrap = $('vt-wrap');
+    if (wrap) {
+      wrap.style.transform = `scale(${currentZoom / 100})`;
+      wrap.style.transformOrigin = 'top center';
+      wrap.style.width = (760 / (currentZoom / 100)) + 'px';
+    }
+    $('vt-zoom-level').textContent = currentZoom + '%';
+  }
+  $('vt-zoom-in').addEventListener('click', () => applyZoom(currentZoom + 10));
+  $('vt-zoom-out').addEventListener('click', () => applyZoom(currentZoom - 10));
+  $('vt-zoom-reset').addEventListener('click', () => applyZoom(100));
+
+  // ========== 步骤1: 语音命名 + 重名检查 ==========
+  async function loadExistingVoices(){
+    try {
+      const r = await fetch('/api/voices');
+      const d = await r.json();
+      const box = $('vt-existing-voices');
+      if (!d.success || !d.voices || d.voices.length === 0) {
+        box.innerHTML = '<div style="font-size:12px;color:rgba(220,220,255,0.65);">暂无已有语音</div>';
+        return;
+      }
+      box.innerHTML = '<div style="font-size:12px;color:rgba(220,220,255,0.78);margin-bottom:8px;">已有语音（内置基础声音只读，仅可管理用户新克隆声音）:</div>' +
+        d.voices.map(v => {
+          const canManage = v.source === 'user';
+          const tag = v.source === 'legacy'
+            ? '<span class="vt-voice-tag">（旧架构）</span>'
+            : (v.source === 'bundled' ? '<span class="vt-voice-tag">（内置只读）</span>' : '<span class="vt-voice-tag">（用户克隆）</span>');
+          const actions = canManage
+            ? `<button class="vt-voice-btn vt-voice-delete" data-action="delete" data-name="${encodeURIComponent(v.name)}">删除</button>`
+            : '';
+          return `<div class="vt-voice-row">
+            <span class="vt-voice-name">${v.name}</span>
+            ${tag}
+            ${actions}
+          </div>`;
+        }).join('');
+    } catch(e) {
+      $('vt-existing-voices').innerHTML = '<div style="font-size:12px;color:#f87171;">加载已有语音失败</div>';
+    }
+  }
+
+  // 已有语音列表事件委托：删除/重命名
+  $('vt-existing-voices').addEventListener('click', async (e) => {
+    const btn = e.target.closest('.vt-voice-btn');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    const name = decodeURIComponent(btn.dataset.name);
+    if (action === 'delete') {
+      if (!confirm(`确定删除语音「${name}」吗？\n该操作会将语音目录移到电脑回收站，可从回收站恢复。`)) return;
+      btn.disabled = true;
+      try {
+        const r = await fetch(`/api/voices/${encodeURIComponent(name)}`, { method: 'DELETE' });
+        const d = await r.json();
+        if (d.success) {
+          alert(`已删除语音「${name}」（可在回收站恢复）`);
+          loadExistingVoices();
+        } else {
+          alert(d.error || '删除失败');
+        }
+      } catch (err) { alert('删除失败: ' + err.message); }
+      finally { btn.disabled = false; }
+    } else if (action === 'rename') {
+      const newName = prompt(`将语音「${name}」重命名为：`, name);
+      if (!newName || newName.trim() === '' || newName.trim() === name) return;
+      btn.disabled = true;
+      try {
+        const r = await fetch(`/api/voices/${encodeURIComponent(name)}/rename`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ newName: newName.trim() }),
+        });
+        const d = await r.json();
+        if (d.success) {
+          alert(`已重命名为「${newName.trim()}」`);
+          loadExistingVoices();
+        } else {
+          alert(d.error || '重命名失败');
+        }
+      } catch (err) { alert('重命名失败: ' + err.message); }
+      finally { btn.disabled = false; }
+    }
+  });
+
+  async function checkVoiceName(){
+    const name = $('vt-voice-name').value.trim();
+    const statusEl = $('vt-name-status');
+    if (!name) {
+      statusEl.innerHTML = '<span style="color:#f87171;">请输入语音名称</span>';
+      voiceName = null;
+      nameChecked = false;
+      lockStep('upload');
+      tryUnlockRun();
+      return;
+    }
+    statusEl.innerHTML = '<span style="color:#fbbf24;">检查中...</span>';
+    try {
+      const r = await fetch('/api/voice-train/check-name', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ voiceName: name })
+      });
+      const d = await r.json();
+      if (!d.success) {
+        statusEl.innerHTML = '<span style="color:#f87171;">' + (d.error||'检查失败') + '</span>';
+        voiceName = null; nameChecked = false;
+        lockStep('upload');
+        tryUnlockRun();
+        return;
+      }
+      voiceName = name;
+      nameChecked = true;
+      if (d.exists) {
+        statusEl.innerHTML = '<span style="color:#fbbf24;">⚠ 已有同名语音，训练后将覆盖原语音</span>';
+      } else {
+        statusEl.innerHTML = '<span style="color:#4ade80;">✓ 名称可用</span>';
+      }
+      unlockStep('upload');
+      $('vt-card-upload').style.opacity = '1';
+      $('vt-card-upload').style.pointerEvents = 'auto';
+      tryUnlockRun();
+    } catch(e) {
+      statusEl.innerHTML = '<span style="color:#f87171;">检查失败: ' + e.message + '</span>';
+      voiceName = null; nameChecked = false;
+      tryUnlockRun();
+    }
+  }
+
+  $('vt-check-name-btn').addEventListener('click', checkVoiceName);
+  $('vt-voice-name').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); checkVoiceName(); }
+  });
+  $('vt-voice-name').addEventListener('input', () => {
+    // 输入变化后重置检查状态
+    if (nameChecked) {
+      nameChecked = false;
+      $('vt-name-status').innerHTML = '';
+      tryUnlockRun();
+    }
+  });
+
+  loadExistingVoices();
+
+  // ========== 步骤2: 文件上传 ==========
+  const uploadZone = $('vt-upload-zone');
+  const fileInput = $('vt-file-input');
+  uploadZone.addEventListener('click', ()=> fileInput.click());
+  uploadZone.addEventListener('dragover', e=>{ e.preventDefault(); uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragleave', ()=> uploadZone.classList.remove('dragover'));
+  uploadZone.addEventListener('drop', e=>{
+    e.preventDefault(); uploadZone.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
+  });
+  fileInput.addEventListener('change', ()=> handleFiles(fileInput.files));
+
+  async function handleFiles(files){
+    for (const f of files){
+      if (!f.name.match(/\.(mp3|wav|m4a|flac|json|mp4|avi|mkv|mov|webm)$/i)) continue;
+      uploadedFiles.push({ file: f });
+    }
+    renderFileList();
+    if (uploadedFiles.length > 0) {
+      unlockStep('paths');
+      // 自动检测路径
+      detectPaths();
+    }
+  }
+
+  function renderFileList(){
+    const list = $('vt-file-list');
+    list.innerHTML = '';
+    uploadedFiles.forEach((f, i) => {
+      const sz = (f.file.size / 1024 / 1024).toFixed(1);
+      const isVideo = /\.(mp4|avi|mkv|mov|webm)$/i.test(f.file.name);
+      const icon = f.file.name.endsWith('.json') ? '📋' : (isVideo ? '🎬' : '🎵');
+      const tag = isVideo ? '<span style="font-size:10px;color:#a78bfa;margin-left:6px;">将转音频</span>' : '';
+      const item = document.createElement('div');
+      item.className = 'vt-file-item';
+      item.innerHTML = `<span>${icon} ${f.file.name}${tag}</span><span class="vt-file-size">${sz} MB</span><span class="vt-file-del" data-i="${i}">✕</span>`;
+      list.appendChild(item);
+    });
+    list.querySelectorAll('.vt-file-del').forEach(x => {
+      x.addEventListener('click', e=>{
+        uploadedFiles.splice(parseInt(e.target.dataset.i), 1);
+        renderFileList();
+        if (uploadedFiles.length === 0) lockStep('paths');
+      });
+    });
+  }
+
+  // ========== 本地目录直选 ==========
+  let localDir = null;
+  $('vt-use-dir-btn').addEventListener('click', () => {
+    const dir = $('vt-local-dir').value.trim();
+    if (!dir) {
+      $('vt-dir-status').textContent = '请输入目录路径';
+      $('vt-dir-status').style.color = '#f87171';
+      return;
+    }
+    localDir = dir;
+    $('vt-dir-status').textContent = '✓ 将使用此目录（跳过上传）';
+    $('vt-dir-status').style.color = '#4ade80';
+    unlockStep('paths');
+    detectPaths();
+  });
+
+  // ========== 步骤3: 路径检测 ==========
+  async function detectPaths(){
+    try {
+      const query = new URLSearchParams({
+        device: $('vt-device').value,
+        inputPath: localDir || '',
+        gptSoVitsRoot: $('vt-path-gpt').value.trim(),
+      });
+      const r = await fetch('/api/voice-train/detect-paths?' + query.toString());
+      const d = await r.json();
+      $('vt-path-gpt').value = d.gptSoVitsRoot || '';
+      $('vt-path-vc').value = d.voiceCloningDir || '';
+      const pf = d.preflight || {};
+      preflightOk = pf.ready === true;
+      pathsOk.gpt = !!d.gptSoVitsRoot && !(pf.missingFiles || []).some(x => x.id === 'gptSoVitsRoot');
+      pathsOk.vc = !!d.voiceCloningDir && !(pf.missingFiles || []).some(x => x.id === 'trainPipeline');
+      $('vt-status-gpt').textContent = pathsOk.gpt ? '✓' : '✗';
+      $('vt-status-gpt').className = 'vt-path-status ' + (pathsOk.gpt ? 'vt-path-ok' : 'vt-path-err');
+      $('vt-status-vc').textContent = pathsOk.vc ? '✓' : '✗';
+      $('vt-status-vc').className = 'vt-path-status ' + (pathsOk.vc ? 'vt-path-ok' : 'vt-path-err');
+      const issues = [];
+      (pf.missingFiles || []).forEach(x => issues.push('缺少文件：' + x.id));
+      (pf.missingModules || []).forEach(x => issues.push('缺少 Python 依赖：' + x));
+      (pf.missingCapabilities || []).forEach(x => issues.push('缺少能力：' + x));
+      (pf.errors || []).slice(0, 3).forEach(x => issues.push(x));
+      const status = $('vt-preflight-status');
+      if (preflightOk) {
+        status.textContent = `✓ ${String(pf.device || '').toUpperCase()} 克隆预检通过（${pf.inputMode === 'presliced' ? '已切片输入' : '普通音频/视频输入'}）`;
+        status.style.color = '#4ade80';
+        status.style.border = '1px solid rgba(74,222,128,0.25)';
+      } else {
+        status.textContent = '✗ 克隆预检未通过：' + (issues.join('；') || '环境信息不完整');
+        status.style.color = '#f87171';
+        status.style.border = '1px solid rgba(248,113,113,0.25)';
+      }
+      // CPU 专用版锁定 CPU 训练设备
+      if (d.flavor === 'cpu') {
+        const devSel = $('vt-device');
+        devSel.value = 'cpu';
+        devSel.disabled = true;
+        devSel.style.opacity = '0.5';
+        devSel.title = 'CPU 专用版固定使用 CPU 训练';
+      }
+      updateEstimate();
+      tryUnlockRun();
+    } catch(e) {
+      preflightOk = false;
+      $('vt-preflight-status').textContent = '✗ 克隆预检请求失败：' + e.message;
+      $('vt-preflight-status').style.color = '#f87171';
+      tryUnlockRun();
+    }
+  }
+
+  $('vt-path-gpt').addEventListener('change', checkPathsManual);
+  $('vt-path-vc').addEventListener('change', checkPathsManual);
+  $('vt-device').addEventListener('change', () => { updateEstimate(); detectPaths(); });
+
+  // 根据设备选择更新预估时间
+  function updateEstimate() {
+    const dev = $('vt-device').value;
+    const est = $('vt-estimate');
+    const sub = $('vt-sub-estimate');
+    if (dev === 'cpu') {
+      est.textContent = '⏱ 预计 2-6 小时（取决于音频时长）';
+      est.style.color = 'rgba(255,200,80,0.85)';
+      est.style.borderColor = 'rgba(255,200,80,0.2)';
+      est.style.background = 'rgba(255,200,80,0.08)';
+      sub.textContent = '上传音频 → 自动人声分离、切片、训练、部署。CPU 模式约 2-6 小时。';
+    } else if (dev === 'gpu') {
+      est.textContent = '⏱ 预计 15-30 分钟';
+      est.style.color = 'rgba(100,220,150,0.85)';
+      est.style.borderColor = 'rgba(100,220,150,0.2)';
+      est.style.background = 'rgba(100,220,150,0.08)';
+      sub.textContent = '上传音频 → 自动人声分离、切片、训练、部署。GPU 模式约 15-30 分钟。';
+    } else {
+      est.textContent = '⏱ 预计 15-30 分钟（GPU）/ 2-6 小时（CPU）';
+      est.style.color = 'rgba(255,200,80,0.85)';
+      est.style.borderColor = 'rgba(255,200,80,0.2)';
+      est.style.background = 'rgba(255,200,80,0.08)';
+      sub.textContent = '上传音频 → 自动人声分离、切片、训练、部署。';
+    }
+  }
+  function checkPathsManual(){
+    pathsOk.gpt = $('vt-path-gpt').value.trim() !== '';
+    pathsOk.vc = $('vt-path-vc').value.trim() !== '';
+    preflightOk = false;
+    $('vt-status-gpt').className = 'vt-path-status ' + (pathsOk.gpt ? 'vt-path-ok' : 'vt-path-err');
+    $('vt-status-vc').className = 'vt-path-status ' + (pathsOk.vc ? 'vt-path-ok' : 'vt-path-err');
+    tryUnlockRun();
+    if (preflightTimer) clearTimeout(preflightTimer);
+    preflightTimer = setTimeout(detectPaths, 350);
+  }
+
+  // ========== 步骤解锁/锁定 ==========
+  function unlockStep(name){
+    $('vt-num-'+name).classList.remove('locked');
+    $('vt-num-'+name).classList.add('active');
+    if (name === 'upload') {
+      $('vt-card-paths').style.opacity = '0.5';
+      $('vt-card-paths').style.pointerEvents = 'none';
+      lockStep('paths');
+    } else if (name === 'paths') {
+      $('vt-card-paths').style.opacity = '1';
+      $('vt-card-paths').style.pointerEvents = 'auto';
+      lockStep('run');
+    }
+    tryUnlockRun();
+  }
+  function lockStep(name){
+    $('vt-num-'+name).classList.add('locked');
+    $('vt-num-'+name).classList.remove('active');
+    if (name === 'paths') {
+      $('vt-card-run').style.opacity = '0.5';
+      $('vt-card-run').style.pointerEvents = 'none';
+    }
+  }
+  function tryUnlockRun(){
+    const hasInput = (uploadedFiles.length > 0) || localDir;
+    if (voiceName && nameChecked && hasInput && pathsOk.gpt && pathsOk.vc && preflightOk) {
+      $('vt-card-run').style.opacity = '1';
+      $('vt-card-run').style.pointerEvents = 'auto';
+      $('vt-num-run').classList.remove('locked');
+      $('vt-num-run').classList.add('active');
+      $('vt-start-btn').disabled = false;
+      const dev = $('vt-device').value;
+      $('vt-start-btn').textContent = dev === 'cpu' ? '开始训练（约2-6小时）' : '开始训练（约15-30分钟）';
+    } else {
+      $('vt-start-btn').disabled = true;
+      $('vt-start-btn').textContent = '请先完成上方步骤';
+    }
+  }
+
+  // ========== 阶段进度更新（绿灯指示，不显示百分比） ==========
+  const STAGE_ORDER = ['separate', 'segment', 'dataset', 'gpt_prepare', 'train', 'refs', 'deploy'];
+
+  function updateStageUI(stage, status, progress) {
+    if (!stage) return;
+    const stageIdx = STAGE_ORDER.indexOf(stage);
+    document.querySelectorAll('.vt-stage-item').forEach(el => {
+      const s = el.dataset.stage;
+      const sIdx = STAGE_ORDER.indexOf(s);
+      if (s === stage) {
+        el.classList.add('active');
+        el.classList.remove('done', 'err');
+        if (status === 'done') { el.classList.add('done'); el.classList.remove('active'); }
+        if (status === 'error') el.classList.add('err');
+      } else if (stageIdx >= 0 && sIdx >= 0 && sIdx < stageIdx) {
+        // 排在前面的阶段标记为完成（绿灯）
+        el.classList.add('done');
+        el.classList.remove('active', 'err');
+      }
+    });
+  }
+
+  // ========== 心跳检测 ==========
+  // 阈值 30 秒：Whisper/Demucs/GPT-SoVITS 训练在 CPU 密集阶段可能 15-25 秒无 SSE 事件
+  // （tqdm 用 \r 覆盖进度条，stderr data 块间隔较大），15 秒阈值会误判"可能卡住"
+  function startHeartbeat() {
+    lastEventTime = Date.now();
+    $('vt-heartbeat').classList.remove('dead');
+    $('vt-heartbeat-text').textContent = '运行中';
+    if (heartbeatTimer) clearInterval(heartbeatTimer);
+    heartbeatTimer = setInterval(() => {
+      const elapsed = Date.now() - lastEventTime;
+      if (elapsed > 30000) {
+        $('vt-heartbeat').classList.add('dead');
+        $('vt-heartbeat-text').textContent = '可能卡住';
+      } else {
+        $('vt-heartbeat').classList.remove('dead');
+        $('vt-heartbeat-text').textContent = '运行中';
+      }
+    }, 5000);
+  }
+  function stopHeartbeat() {
+    if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
+  }
+  function updateHeartbeat() {
+    lastEventTime = Date.now();
+  }
+
+  // ========== 步骤4: 开始训练 ==========
+  $('vt-start-btn').addEventListener('click', async ()=>{
+    if (training) return;
+    if (!voiceName || !nameChecked || (uploadedFiles.length === 0 && !localDir)) return;
+
+    training = true;
+    $('vt-start-btn').disabled = true;
+    $('vt-start-btn').textContent = '训练中...';
+    $('vt-progress-wrap').classList.add('active');
+    $('vt-done-msg').classList.remove('show');
+    $('vt-log-box').innerHTML = '';
+
+    // 重置阶段UI
+    document.querySelectorAll('.vt-stage-item').forEach(el => {
+      el.classList.remove('active', 'done', 'err');
+    });
+
+    startHeartbeat();
+
+    try {
+      let inputDir;
+      if (localDir) {
+        // 直接使用本地目录
+        inputDir = localDir;
+        addLog('system', 'ok', `使用本地目录: ${inputDir}`);
+      } else {
+        // 上传文件
+        const videoCount = uploadedFiles.filter(f => /\.(mp4|avi|mkv|mov|webm)$/i.test(f.file.name)).length;
+        addLog('system', 'running', `上传 ${uploadedFiles.length} 个文件${videoCount > 0 ? `（含 ${videoCount} 个视频，将自动转音频）` : ''}...`);
+        const formData = new FormData();
+        uploadedFiles.forEach(f => formData.append('audio', f.file));
+        const upRes = await fetch('/api/voice-train/upload', { method:'POST', body: formData });
+        const upData = await upRes.json();
+        if (!upData.success) throw new Error(upData.error || '上传失败');
+        // 显示视频转换结果
+        if (upData.converted && upData.converted.length > 0) {
+          for (const c of upData.converted) {
+            addLog('system', 'ok', `🎬→🎵 ${c.from} → ${c.to}`);
+          }
+        }
+        if (upData.failed && upData.failed.length > 0) {
+          for (const f of upData.failed) {
+            addLog('system', 'error', `视频转换失败 ${f.file}: ${f.error}`);
+          }
+          throw new Error('部分视频转换失败，请检查日志');
+        }
+        addLog('system', 'ok', `上传完成，保存到临时目录`);
+        inputDir = upData.mp3Dir;
+      }
+
+      const startRes = await fetch('/api/voice-train/start', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          voiceName: voiceName,
+          mp3Dir: inputDir,
+          localDir: localDir || '',
+          gptSoVitsRoot: $('vt-path-gpt').value.trim(),
+          voiceCloningDir: $('vt-path-vc').value.trim(),
+          device: $('vt-device').value,
+        })
+      });
+      const startData = await startRes.json();
+      if (!startData.success) throw new Error(startData.error || '启动失败');
+      const jobId = startData.jobId;
+      currentJobId = jobId;
+
+      // 显示控制按钮
+      $('vt-control-btns').style.display = 'flex';
+      $('vt-pause-btn').style.display = '';
+      $('vt-resume-btn').style.display = 'none';
+
+      const es = new EventSource(`/api/voice-train/progress/${jobId}`);
+      es.onmessage = (ev) => {
+        updateHeartbeat();
+        const d = JSON.parse(ev.data);
+        handleProgress(d, es);
+      };
+      es.onerror = () => {
+        addLog('system', 'err', 'SSE连接断开');
+        es.close();
+        stopHeartbeat();
+        training = false;
+      };
+    } catch(e) {
+      addLog('system', 'err', e.message);
+      training = false;
+      stopHeartbeat();
+      $('vt-start-btn').disabled = false;
+      $('vt-start-btn').textContent = '重试';
+    }
+  });
+
+  // RAF节流：避免日志过多导致页面卡顿
+  let pendingLogs = [];
+  let rafScheduled = false;
+  function scheduleFlushLogs() {
+    if (!rafScheduled) {
+      rafScheduled = true;
+      requestAnimationFrame(() => {
+        rafScheduled = false;
+        flushLogs();
+      });
+    }
+  }
+  function flushLogs() {
+    if (pendingLogs.length === 0) return;
+    const box = $('vt-log-box');
+    const frag = document.createDocumentFragment();
+    pendingLogs.forEach(log => {
+      const line = document.createElement('div');
+      line.className = 'vt-log-line' + (log.status === 'error' || log.status === 'err' ? ' err' : log.status === 'done' || log.status === 'ok' ? ' ok' : log.status === 'running' ? ' vt-log-running' : '');
+      const t = new Date().toLocaleTimeString();
+      const stageLabel = log.stage && log.stage !== 'system' ? `<span class="vt-log-stage">[${log.stage}]</span> ` : '';
+      line.innerHTML = `<span class="vt-log-time">${t}</span>${stageLabel}${log.msg || ''}`;
+      frag.appendChild(line);
+    });
+    box.appendChild(frag);
+    box.scrollTop = box.scrollHeight;
+    pendingLogs = [];
+  }
+
+  function handleProgress(d, es){
+    updateHeartbeat();
+    // 更新阶段进度
+    if (d.stage && d.status) {
+      updateStageUI(d.stage, d.status, d.progress);
+    }
+    // 添加日志（节流）
+    addLog(d.stage || 'system', d.status, d.msg);
+    if (d.status === 'done' && d.stage === 'all') {
+      es.close();
+      training = false;
+      stopHeartbeat();
+      $('vt-start-btn').textContent = '训练完成';
+      $('vt-done-msg').classList.add('show');
+      $('vt-done-msg').textContent = d.msg || '训练完成！请重启 TTS 服务后即可使用。';
+      $('vt-heartbeat-text').textContent = '已完成';
+      document.querySelectorAll('.vt-step-num').forEach(x => { x.classList.remove('active','locked'); x.classList.add('done'); });
+      // 标记所有阶段完成（绿灯）
+      document.querySelectorAll('.vt-stage-item').forEach(el => {
+        el.classList.remove('active'); el.classList.add('done');
+      });
+    }
+    if (d.status === 'error') {
+      es.close();
+      training = false;
+      stopHeartbeat();
+      $('vt-start-btn').disabled = false;
+      $('vt-start-btn').textContent = '重新开始';
+      $('vt-heartbeat-text').textContent = '出错（可继续）';
+      updateStageUI(d.stage, 'error', 0);
+      // 崩溃后显示"继续进程"按钮，允许从断点恢复（--resume 会跳过已完成阶段）
+      $('vt-pause-btn').style.display = 'none';
+      $('vt-resume-btn').style.display = '';
+    }
+  }
+
+  function addLog(stage, status, msg){
+    if (!msg) return;
+    pendingLogs.push({ stage, status, msg });
+    scheduleFlushLogs();
+  }
+
+  // ========== 训练控制按钮事件 ==========
+  $('vt-pause-btn').addEventListener('click', async () => {
+    if (!currentJobId) return;
+    if (!confirm('确定暂停当前训练进程？暂停后可点击"继续进程"恢复。')) return;
+    try {
+      const r = await fetch(`/api/voice-train/pause/${currentJobId}`, { method: 'POST' });
+      const d = await r.json();
+      if (d.success) {
+        addLog('system', 'ok', d.message);
+        $('vt-pause-btn').style.display = 'none';
+        $('vt-resume-btn').style.display = '';
+        $('vt-heartbeat-text').textContent = '已暂停';
+        training = false;
+        stopHeartbeat();
+      } else {
+        addLog('system', 'err', d.error || '暂停失败');
+      }
+    } catch (e) {
+      addLog('system', 'err', '暂停请求失败: ' + e.message);
+    }
+  });
+
+  $('vt-resume-btn').addEventListener('click', async () => {
+    if (!currentJobId) return;
+    try {
+      const r = await fetch(`/api/voice-train/resume/${currentJobId}`, { method: 'POST' });
+      const d = await r.json();
+      if (d.success) {
+        addLog('system', 'ok', d.message);
+        $('vt-pause-btn').style.display = '';
+        $('vt-resume-btn').style.display = 'none';
+        training = true;
+        startHeartbeat();
+        // 重新订阅 SSE
+        const es = new EventSource(`/api/voice-train/progress/${currentJobId}`);
+        es.onmessage = (ev) => {
+          updateHeartbeat();
+          const dd = JSON.parse(ev.data);
+          handleProgress(dd, es);
+        };
+        es.onerror = () => {
+          addLog('system', 'err', 'SSE连接断开');
+          es.close();
+          stopHeartbeat();
+          training = false;
+        };
+      } else {
+        addLog('system', 'err', d.error || '继续失败');
+      }
+    } catch (e) {
+      addLog('system', 'err', '继续请求失败: ' + e.message);
+    }
+  });
+
+  $('vt-delete-btn').addEventListener('click', async () => {
+    if (!currentJobId) return;
+    if (!confirm('确定删除当前未完成进程？此操作不可恢复，将删除所有中间数据。')) return;
+    try {
+      const r = await fetch(`/api/voice-train/delete/${currentJobId}`, { method: 'POST' });
+      const d = await r.json();
+      if (d.success) {
+        addLog('system', 'ok', d.message);
+        $('vt-control-btns').style.display = 'none';
+        $('vt-progress-wrap').classList.remove('active');
+        $('vt-heartbeat-text').textContent = '已删除';
+        $('vt-start-btn').disabled = false;
+        $('vt-start-btn').textContent = $('vt-device').value === 'cpu' ? '开始训练（约2-6小时）' : '开始训练（约15-30分钟）';
+        training = false;
+        currentJobId = null;
+        stopHeartbeat();
+        // 重置阶段UI
+        document.querySelectorAll('.vt-stage-item').forEach(el => {
+          el.classList.remove('active', 'done', 'err');
+        });
+      } else {
+        addLog('system', 'err', d.error || '删除失败');
+      }
+    } catch (e) {
+      addLog('system', 'err', '删除请求失败: ' + e.message);
+    }
+  });
+
+  // ========== 加载未完成进程列表 ==========
+  async function loadUnfinishedJobs() {
+    try {
+      const r = await fetch('/api/voice-train/jobs');
+      const d = await r.json();
+      console.log('[loadUnfinishedJobs] response:', d);
+      if (!d.success || !d.jobs || d.jobs.length === 0) {
+        $('vt-jobs-list').style.display = 'none';
+        return;
+      }
+      // 只取最近的一个未完成进程（如果有多个，其余的自动清理）
+      const latestJob = d.jobs[0];
+      // 如果有多个未完成进程，自动删除旧的（只保留最近一个）
+      if (d.jobs.length > 1) {
+        for (let i = 1; i < d.jobs.length; i++) {
+          try { await fetch(`/api/voice-train/delete/${d.jobs[i].jobId}`, { method: 'POST' }); } catch {}
+        }
+      }
+      // 自动填充前3步，第4步显示继续/删除按钮
+      const j = latestJob;
+      const timeStr = j.startTime ? new Date(j.startTime).toLocaleString() : '';
+      const stages = j.completedStages && j.completedStages.length > 0 ? `已完成阶段: ${j.completedStages.join(', ')}` : '无已完成阶段';
+
+      // 步骤1：填充语音名（只读）
+      voiceName = j.voiceName;
+      nameChecked = true;
+      $('vt-voice-name').value = j.voiceName || '';
+      $('vt-voice-name').readOnly = true;
+      $('vt-voice-name').style.opacity = '0.6';
+      $('vt-check-name-btn').disabled = true;
+      $('vt-check-name-btn').style.opacity = '0.4';
+      $('vt-name-status').textContent = '✓ 使用上次语音名（删除进程后可重新输入）';
+      $('vt-name-status').style.color = '#4ade80';
+      $('vt-num-char').classList.remove('active', 'locked');
+      $('vt-num-char').classList.add('done');
+
+      // 步骤2：填充输入目录（只读显示）
+      localDir = j.input;
+      uploadedFiles = [];
+      $('vt-card-upload').style.opacity = '1';
+      $('vt-card-upload').style.pointerEvents = 'auto';
+      $('vt-num-upload').classList.remove('locked');
+      $('vt-num-upload').classList.add('done');
+      $('vt-file-list').innerHTML = `<div style="padding:10px; border-radius:8px; background:rgba(100,220,150,0.08); border:1px solid rgba(100,220,150,0.2); font-size:13px; color:rgba(180,220,180,0.85);">📁 使用上次的输入目录：<br><code style="color:#a78bfa;">${j.input || '未知'}</code></div>`;
+
+      // 步骤3：路径自动检测保持，设备选择器设为上次的
+      pathsOk.gpt = true;
+      pathsOk.vc = true;
+      $('vt-card-paths').style.opacity = '1';
+      $('vt-card-paths').style.pointerEvents = 'auto';
+      $('vt-num-paths').classList.remove('locked');
+      $('vt-num-paths').classList.add('done');
+      if (j.device && j.device !== 'auto') {
+        $('vt-device').value = j.device;
+      }
+
+      // 步骤4：显示继续训练 / 删除并重新开始
+      $('vt-card-run').style.opacity = '1';
+      $('vt-card-run').style.pointerEvents = 'auto';
+      $('vt-num-run').classList.remove('locked');
+      $('vt-num-run').classList.add('active');
+      $('vt-jobs-list').style.display = 'block';
+      $('vt-jobs-list').innerHTML = `<div style="padding:14px; border-radius:10px; background:rgba(255,200,80,0.08); border:1px solid rgba(255,200,80,0.25); font-size:13px; color:rgba(220,220,255,0.9);">
+        <div style="font-size:14px; margin-bottom:6px;">⚠ 发现未完成的训练进程</div>
+        <div><b>语音名:</b> ${j.voiceName || '未知'}</div>
+        <div><b>输入目录:</b> <code style="color:#a78bfa;">${j.input || '未知'}</code></div>
+        <div><b>状态:</b> ${j.status === 'interrupted' ? '已中断（页面被关/服务重启）' : j.status} ${timeStr ? ' (' + timeStr + ')' : ''}</div>
+        <div style="margin-top:4px;"><b>进度:</b> ${stages}</div>
+        <div style="margin-top:10px; display:flex; gap:8px;">
+          <button id="vt-job-resume-btn" style="padding:8px 18px; border-radius:8px; border:1px solid rgba(100,220,150,0.4); background:rgba(100,220,150,0.12); color:#66dd99; cursor:pointer; font-size:13px;">继续训练</button>
+          <button id="vt-job-delete-btn" style="padding:8px 18px; border-radius:8px; border:1px solid rgba(255,100,100,0.4); background:rgba(255,100,100,0.12); color:#ff6666; cursor:pointer; font-size:13px;">删除并重新开始</button>
+        </div>
+      </div>`;
+      // 隐藏原来的开始训练按钮（用继续/删除替代）
+      $('vt-start-btn').style.display = 'none';
+      $('vt-control-btns').style.display = 'none';
+
+      // 绑定"继续训练"按钮
+      $('vt-job-resume-btn').addEventListener('click', async () => {
+        const jid = j.jobId;
+        try {
+          const r2 = await fetch(`/api/voice-train/resume/${jid}`, { method: 'POST' });
+          const d2 = await r2.json();
+          if (d2.success) {
+            currentJobId = jid;
+            training = true;
+            $('vt-jobs-list').style.display = 'none';
+            $('vt-start-btn').style.display = '';
+            $('vt-start-btn').disabled = true;
+            $('vt-start-btn').textContent = '训练中...';
+            $('vt-progress-wrap').classList.add('active');
+            $('vt-control-btns').style.display = 'flex';
+            $('vt-pause-btn').style.display = '';
+            $('vt-resume-btn').style.display = 'none';
+            startHeartbeat();
+            const es = new EventSource(`/api/voice-train/progress/${jid}`);
+            es.onmessage = (ev) => {
+              updateHeartbeat();
+              const dd = JSON.parse(ev.data);
+              handleProgress(dd, es);
+            };
+            es.onerror = () => { es.close(); stopHeartbeat(); training = false; };
+            addLog('system', 'ok', d2.message);
+          } else {
+            addLog('system', 'err', d2.error || '继续失败');
+          }
+        } catch (e) {
+          addLog('system', 'err', '继续请求失败: ' + e.message);
+        }
+      });
+
+      // 绑定"删除并重新开始"按钮
+      $('vt-job-delete-btn').addEventListener('click', async () => {
+        if (!confirm('确定删除当前未完成进程并重新开始？此操作不可恢复，将清空所有中间数据。')) return;
+        const jid = j.jobId;
+        try {
+          const r2 = await fetch(`/api/voice-train/delete/${jid}`, { method: 'POST' });
+          const d2 = await r2.json();
+          if (d2.success) {
+            addLog('system', 'ok', d2.message);
+            // 重置所有步骤，让用户重新配置
+            voiceName = null;
+            nameChecked = false;
+            localDir = null;
+            uploadedFiles = [];
+            pathsOk = { gpt: false, vc: false };
+            $('vt-voice-name').value = '';
+            $('vt-voice-name').readOnly = false;
+            $('vt-voice-name').style.opacity = '1';
+            $('vt-check-name-btn').disabled = false;
+            $('vt-check-name-btn').style.opacity = '1';
+            $('vt-name-status').textContent = '';
+            $('vt-file-list').innerHTML = '';
+            $('vt-num-char').classList.remove('done');
+            $('vt-num-char').classList.add('active');
+            $('vt-card-upload').style.opacity = '0.5';
+            $('vt-card-upload').style.pointerEvents = 'none';
+            $('vt-num-upload').classList.remove('done');
+            $('vt-num-upload').classList.add('locked');
+            $('vt-card-paths').style.opacity = '0.5';
+            $('vt-card-paths').style.pointerEvents = 'none';
+            $('vt-num-paths').classList.remove('done');
+            $('vt-num-paths').classList.add('locked');
+            $('vt-card-run').style.opacity = '0.5';
+            $('vt-card-run').style.pointerEvents = 'none';
+            $('vt-num-run').classList.remove('active');
+            $('vt-num-run').classList.add('locked');
+            $('vt-start-btn').style.display = '';
+            $('vt-start-btn').disabled = true;
+            $('vt-start-btn').textContent = '请先完成上方步骤';
+            $('vt-jobs-list').style.display = 'none';
+            $('vt-control-btns').style.display = 'none';
+          } else {
+            addLog('system', 'err', d2.error || '删除失败');
+          }
+        } catch (e) {
+          addLog('system', 'err', '删除请求失败: ' + e.message);
+        }
+      });
+    } catch (e) {
+      console.error('[loadUnfinishedJobs] error:', e);
+      $('vt-jobs-list').style.display = 'block';
+      $('vt-jobs-list').innerHTML = `<div style="padding:10px; border-radius:8px; background:rgba(255,100,100,0.08); border:1px solid rgba(255,100,100,0.2); font-size:12px; color:#ff8888;">恢复未完成进程时出错: ${e.message}</div>`;
+    }
+  }
+
+  // ========== 初始化 ==========
+  loadExistingVoices();
+  loadUnfinishedJobs();
+})();
+</script>
+</body>
+</html>

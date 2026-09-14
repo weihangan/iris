@@ -1,0 +1,92 @@
+请根据以下对话内容，提取并更新用户的记忆信息。
+
+当前记忆（JSON）：
+{{CURRENT_MEMORY}}
+
+最新对话（user=用户，assistant=角色）：
+{{RECENT_MESSAGES}}
+
+请分析对话中是否包含以下可记忆信息，按需输出JSON更新：
+
+【可记忆信息类型】
+1. 用户姓名、昵称、称呼偏好
+2. 用户生日（格式：YYYY-MM-DD）
+3. 用户位置、职业
+4. 用户喜好（喜欢/不喜欢什么）
+5. 用户当前情绪状态 + 情绪强度（1-5）+ 触发原因（一句话）+ 来源与置信度
+6. 用户最近的困扰或烦恼
+7. 用户重要事件（考试、面试、旅行、纪念日等，含日期）
+8. 用户沟通偏好
+9. 节日相关偏好
+10. 永久事实（姓名/生日/家庭关系/重大人生事件等长期不变的事实）
+11. 角色自身情感状态（角色在与用户对话过程中展现/产生的情感，如：被理解、感到孤单、想靠近用户、欲言又止等，区别于用户情绪）
+12. 事实纠正：若新对话否定/修正了已有 permanent_facts 中的某条（如"以前说住北京，现在说搬到上海"），用 superseded_facts 字段指出被纠正的旧事实文本
+
+【permanent_facts 字段说明】
+每条 permanent_fact 是一个对象：
+{
+  "fact": "事实文本",
+  "category": "personal_info|family|career|health|relationship|major_event|other",
+  "confidence": 0.0-1.0（默认1.0，AI不确定时降低），
+  "date": "YYYY-MM-DD（首次记录日期）",
+  "source": "对话中明确提及/对话中推断"
+}
+
+【mood_trajectory 条目格式】
+{
+  "mood": "开心/难过/焦虑/疲惫/生气/孤独/害怕/无聊/迷茫/平静等",
+  "intensity": 1-5,
+  "trigger": "触发原因（一句话）",
+  "timestamp": "YYYY-MM-DD HH:MM:SS"
+}
+
+请严格按照以下JSON格式输出，没有需要更新的字段留空字符串或空数组：
+
+{
+  "user_profile": {
+    "name": "",
+    "nickname": "",
+    "birthday": "",
+    "location": "",
+    "occupation": ""
+  },
+  "preferences": {
+    "likes": [],
+    "dislikes": [],
+    "topics": [],
+    "communication_style": ""
+  },
+  "emotional_state": {
+    "recent_mood": "",
+    "recent_mood_intensity": 0,
+    "recent_mood_trigger": "",
+    "recent_mood_source": "assistant_inference",
+    "recent_mood_confidence": 0.0,
+    "recent_stress": "",
+    "recent_troubles": [],
+    "mood_trajectory": [],
+    "last_updated": ""
+  },
+  "character_emotional_state": {
+    "current_emotion": "",
+    "emotion_intensity": 0,
+    "emotion_trigger": "",
+    "emotion_trajectory": []
+  },
+  "important_events": [],
+  "relationship_notes": [{ "note": "", "evidence": "对应的用户原话", "confidence": 0.0 }],
+  "festival_notes": [],
+  "permanent_facts": [],
+  "superseded_facts": [],
+  "summary": ""
+}
+
+只输出需要更新的字段，不需要更新的字段留空。
+注意：
+1. permanent_facts 中新增事实时，请评估 confidence；用户明确陈述为1.0，合理推断只能为0.5-0.7。
+2. 用户明确说“我很焦虑/开心/难过”等时，recent_mood_source=explicit_user、confidence=1.0。
+3. 根据语气推断但用户未明说时，recent_mood_source=assistant_inference、confidence不得高于0.6；推断不得推翻已有的明确情绪陈述。
+4. 承诺、重要事件、关系变化和尚未解决的困扰应提取；普通寒暄、临时客套和角色自己的修辞不要写入长期记忆。
+5. 用户画像、用户偏好、永久事实、重要事件和关系状态只能以 user 行中的明确表述为主要证据；assistant 行仅用于判断角色自身情感，不能证明用户身份、偏好、共同经历或双方关系。
+6. relationship_notes 只记录用户明确确认的关系变化、相处边界或双方已经履行的承诺，并必须附上能在 user 行中找到的 evidence；角色单方面说“想念、永远陪伴、曾经一起”等，不得据此升级关系或创造共同回忆。
+7. 用户本轮是在假设、举例、引用别人、否定或开玩笑时，不要把其中内容直接保存成用户事实；无法确认就不更新。

@@ -1,0 +1,97 @@
+{
+  "name": "iris-chat",
+  "version": "2.0.0",
+  "description": "iris-chat reusable PMX desktop-avatar development framework",
+  "main": "dist/electron/main.js",
+  "appId": "com.iris.chat",
+  "productName": "iris-chat",
+  "chatx2": {
+    "expressPort": 3003,
+    "ttsPort": 9882,
+    "userDataDir": "IrisChat"
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "vite build && playwright test",
+    "audit:bootstrap": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-bootstrap-audit.ps1 -Phase 4",
+    "audit:model": "node scripts/audit-model.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite build && electron .",
+    "tts:check:cpu": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-tts-runtime.ps1 -Device cpu",
+    "tts:check:gpu": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-tts-runtime.ps1 -Device gpu",
+    "gpu:check": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-gpu-driver.ps1",
+    "tts:cpu": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-tts-runtime.ps1 -Device cpu",
+    "tts:gpu": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-tts-runtime.ps1 -Device gpu",
+    "runtime:install": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-runtime.ps1 -Device both",
+    "voice-input:install": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-voice-input.ps1 -Device cpu",
+    "voice-clone:install": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-voice-clone.ps1 -Device gpu",
+    "audit:iris": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/audit-iris.ps1",
+    "prepare-release": "node scripts/prepare-release.mjs",
+    "prepare-release-offline": "node scripts/prepare-release-offline.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1",
+    "@types/three": "0.185.1",
+    "electron": "42.7.0",
+    "electron-builder": "26.15.3",
+    "three": "0.185.1",
+    "typescript": "7.0.2",
+    "vite": "8.1.5",
+    "vite-plugin-electron": "1.1.0",
+    "vite-plugin-electron-renderer": "1.0.0",
+    "vitest": "4.1.10"
+  },
+  "dependencies": {
+    "@yohawing/three-mmd-loader": "0.6.0",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "form-data": "^4.0.0",
+    "multer": "^1.4.5-lts.1"
+  },
+  "build": {
+    "appId": "com.iris.chat",
+    "productName": "iris-chat",
+    "directories": {
+      "output": "release-dist",
+      "buildResources": "build-resources"
+    },
+    "files": [
+      "dist/**",
+      "models/**",
+      "chat5-compat/server.js",
+      "chat5-compat/services/**",
+      "chat5-compat/public/**",
+      "chat5-compat/prompts/**",
+      "chat5-compat/character/**",
+      "chat5-compat/tts_engine/**",
+      "chat5-compat/voice_engine/**",
+      "runtime/**",
+      "chat5-compat/NOTICE",
+      "data/settings.json",
+      "data/release.json",
+      "package.json",
+      "node_modules/**",
+      "!**/.env",
+      "!**/*_chat_history.json",
+      "!**/*_compressed_history.json",
+      "!**/*_memory.json",
+      "!**/*_messages.jsonl",
+      "!**/voice_cache.json",
+      "!**/__pycache__/**",
+      "!**/*.pyc",
+      "!**/*.log"
+    ],
+    "win": {
+      "target": "dir",
+      "icon": "build-resources/icon.ico"
+    },
+    "asar": false
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

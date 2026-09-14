@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "description": "Minimal shared action and voice-action catalog for framework development.",
+  "entries": [
+    { "displayName": "待机 双手后背", "type": "idle", "vmdPath": "../shared/motions/待机 双手后背.vmd", "emotions": ["neutral"], "dialogueSafe": true },
+    { "displayName": "解释 右手轻摊一次后回正", "type": "voice", "vmdPath": "../shared/motions/解释_右手轻摊一次后回正.vmd", "emotions": ["explaining"], "dialogueSafe": true },
+    { "displayName": "疑惑 人物左侧歪头10度", "type": "voice", "vmdPath": "../shared/motions/疑惑_人物左侧歪头10度_仅头部.vmd", "emotions": ["curious"], "dialogueSafe": true },
+    { "displayName": "假装生气", "type": "voice", "vmdPath": "../shared/motions/斜视瞪.vmd", "emotions": ["angry"], "dialogueSafe": true }
+  ]
+}

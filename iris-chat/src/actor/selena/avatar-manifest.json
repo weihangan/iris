@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "manifestVersion": "draft-3.1",
+  "model": {
+    "internalName": "赛琳娜希声",
+    "displayName": "赛琳娜 希声",
+    "sha256": "C8636D99356C51D059B3FC38FFF062123C57D82164A00BBEB76B40674E503DF5",
+    "pmxVersion": 2.0,
+    "geometry": {
+      "vertices": 43694,
+      "triangles": 44597,
+      "materials": 41,
+      "bones": 594,
+      "morphs": 108,
+      "textures": 15
+    },
+    "textures": [
+      "textures\\Face_comb.png",
+      "spa\\toon_skin0.png",
+      "spa\\toon_no.png",
+      "textures\\face+.png",
+      "textures\\Eyes.png",
+      "textures\\Body_comb.png",
+      "textures\\Hair01_comb.png",
+      "spa\\toon_fog2.png",
+      "textures\\Hair01Hi_comb.png",
+      "spa\\spa_Mask.png",
+      "textures\\Hair02_comb.png",
+      "textures\\Upper.png",
+      "textures\\Down.png",
+      "textures\\Alpha.png",
+      "textures\\bqb.png"
+    ],
+    "credit": "模型：战双帕弥什/白泽",
+    "licenseStatus": "blocked-distribution-missing-readme"
+  },
+  "materialCompatibility": {
+    "rules": [
+      {
+        "materialIndex": 7,
+        "materialName": "Face_2+",
+        "action": "suppress-color",
+        "reason": "仅适用于本 Manifest SHA-256：Face_2+ 是鼻部 81 顶点/114 三角形的可选白色高光覆盖层。geometry-aware alpha 已修复其透明区黑底，但白色楔形在当前 Standard 材质路径中仍不兼容；runtime sync 后只关闭该覆盖层的 colorWrite，不关闭贴图或脸部皮肤材质。"
+      }
+    ]
+  },
+  "morphs": {
+    "visemes": {
+      "a": "あ",
+      "i": "い",
+      "u": "う",
+      "e": "え",
+      "o": "お"
+    },
+    "blink": "まばたき",
+    "emotions": {
+      "neutral": "",
+      "serious": "真面目",
+      "happy": "笑い",
+      "smile": "にこり",
+      "surprised": "びっくり",
+      "angry": "怒り",
+      "concerned": "困る"
+    },
+    "blush": {
+      "name": "FaceRed",
+      "safeRange": { "min": 0, "max": 0.35 }
+    },
+    "shy": "照れ",
+    "tears": "涙"
+  },
+  "bones": {
+    "root": "全ての親",
+    "center": "センター",
+    "head": "頭",
+    "neck": "首",
+    "bothEyes": "両目",
+    "leftEye": "左目",
+    "rightEye": "右目",
+    "upperBody": "上半身",
+    "lowerBody": "下半身",
+    "waist": "腰",
+    "leftShoulder": "左肩",
+    "rightShoulder": "右肩",
+    "leftArm": "左腕",
+    "rightArm": "右腕",
+    "leftElbow": "左ひじ",
+    "rightElbow": "右ひじ",
+    "leftHand": "左手首",
+    "rightHand": "右手首",
+    "leftLeg": "左足",
+    "rightLeg": "右足",
+    "leftKnee": "左ひざ",
+    "rightKnee": "右ひざ",
+    "leftFoot": "左足首",
+    "rightFoot": "右足首",
+    "leftFootIK": "左足ＩＫ",
+    "rightFootIK": "右足ＩＫ",
+    "leftToeIK": "左つま先ＩＫ",
+    "rightToeIK": "右つま先ＩＫ"
+  },
+  "clothing": {
+    "white": "White",
+    "blue": "Blue",
+    "note": "White(group, type=0) 与 Blue(material, type=8) 机制不同，无直接数据层重叠。详见 whiteType/blueType/overlap/overlapReason/usage 字段。",
+    "whiteType": "group",
+    "blueType": "material",
+    "whiteOffsetCount": 2,
+    "blueOffsetCount": 4,
+    "overlap": "no-direct-overlap",
+    "overlapReason": "White(group, type=0) 引用其他 morph 间接改变顶点位置；Blue(material, type=8) 直接修改材质属性。机制不同，不会在同一数据层重叠。",
+    "usage": "二者不应同时激活到最大值；White 用于切换白色服装形态，Blue 用于切换蓝色服装形态。",
+    "blueMaterialIndex": 21,
+    "blueMaterialName": "UP_Blue",
+    "inspectionRef": "docs/evidence/phase-3-clothing-overlap.txt"
+  },
+  "capabilities": [
+    "visemes",
+    "blink",
+    "emotions",
+    "gaze",
+    "blush",
+    "shy",
+    "tears"
+  ],
+  "audit": {
+    "createdAt": "2026-07-17",
+    "createdBy": "Phase 3 Task 3.1 (TDD)",
+    "contractRef": "references/selena-model-contract.md",
+    "notes": "本 Manifest 为草稿，骨骼/Morph 映射来自 PMX 解析。FaceRed 上限 0.35 来自 Phase 3 计划。Three.js 渲染验证和材质重叠检查在 Task 3.2/3.3 完成。"
+  }
+}

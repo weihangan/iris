@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "libraryId": "chatx2-shared-expression-core-v1",
+  "description": "Model-independent semantic facial recipes. Native PMX morph names belong in each model performance profile, never in this file.",
+  "timingDefaults": {
+    "enterMs": 420,
+    "settleMs": 420,
+    "exitMs": 550,
+    "microEnterMs": 110,
+    "microHoldMs": 280,
+    "microExitMs": 420
+  },
+  "requiredCapabilities": [
+    "visemeA", "visemeI", "visemeU", "visemeE", "visemeO", "blink",
+    "browInnerUp", "browDownLeft", "browDownRight",
+    "eyeWideLeft", "eyeWideRight", "eyeSquintLeft", "eyeSquintRight",
+    "mouthSmileLeft", "mouthSmileRight", "mouthFrownLeft", "mouthFrownRight"
+  ],
+  "optionalCapabilities": [
+    "browOuterUpLeft", "browOuterUpRight", "mouthPucker", "mouthStretchLeft",
+    "mouthStretchRight", "pupilSmall", "pupilLarge", "blush", "tears",
+    "starEyes", "heartEyes"
+  ],
+  "recipes": {
+    "neutral": {
+      "label": "自然中性",
+      "base": { "eyeSquintLeft": 0.08, "eyeSquintRight": 0.08, "eyeSmile": 0.04, "eyeLidClose": 0.0, "mouthSmileLeft": 0.1, "mouthSmileRight": 0.1 },
+      "microAccents": ["soft-focus", "half-blink", "subtle-brow-shift"],
+      "gaze": "user",
+      "pupil": "stable"
+    },
+    "explaining": {
+      "label": "日常解释",
+      "base": { "browInnerUp": 0.16, "eyeSquintLeft": 0.1, "eyeSquintRight": 0.1, "eyeLidClose": 0.01, "mouthSmileLeft": 0.13, "mouthSmileRight": 0.13 },
+      "microAccents": ["single-brow-emphasis", "soft-squint-emphasis"],
+      "gaze": "user",
+      "pupil": "stable"
+    },
+    "smile": {
+      "label": "轻微微笑",
+      "base": { "eyeSquintLeft": 0.28, "eyeSquintRight": 0.28, "eyeSmile": 0.28, "eyeLidClose": 0.02, "cheekRaiseLeft": 0.16, "cheekRaiseRight": 0.16, "mouthSmileLeft": 0.43, "mouthSmileRight": 0.43 },
+      "microAccents": ["warm-eye-smile"],
+      "gaze": "user",
+      "pupil": "soft-dilate"
+    },
+    "happy": {
+      "label": "开心",
+      "base": { "browOuterUpLeft": 0.28, "browOuterUpRight": 0.28, "eyeSquintLeft": 0.46, "eyeSquintRight": 0.46, "eyeSmile": 0.55, "eyeLidClose": 0.0, "cheekRaiseLeft": 0.3, "cheekRaiseRight": 0.3, "mouthSmileLeft": 0.72, "mouthSmileRight": 0.72 },
+      "microAccents": ["warm-eye-smile", "brief-brighten"],
+      "gaze": "user",
+      "pupil": "soft-dilate"
+    },
+    "excited": {
+      "label": "兴奋",
+      "base": { "browInnerUp": 0.42, "eyeWideLeft": 0.68, "eyeWideRight": 0.68, "cheekRaiseLeft": 0.28, "cheekRaiseRight": 0.28, "mouthSmileLeft": 0.75, "mouthSmileRight": 0.75 },
+      "microAccents": ["brighten-peak", "quick-happy-squint"],
+      "gaze": "user",
+      "pupil": "event-dilate"
+    },
+    "gentle": {
+      "label": "温柔安慰",
+      "base": { "browInnerUp": 0.2, "eyeSquintLeft": 0.34, "eyeSquintRight": 0.34, "eyeSmile": 0.28, "eyeLidClose": 0.03, "cheekRaiseLeft": 0.18, "cheekRaiseRight": 0.18, "mouthSmileLeft": 0.46, "mouthSmileRight": 0.46 },
+      "microAccents": ["soft-focus", "warm-eye-smile"],
+      "gaze": "user",
+      "pupil": "soft-dilate"
+    },
+    "grateful": {
+      "label": "感谢",
+      "base": { "browInnerUp": 0.22, "eyeSquintLeft": 0.3, "eyeSquintRight": 0.3, "eyeSmile": 0.2, "eyeLidClose": 0.04, "mouthSmileLeft": 0.4, "mouthSmileRight": 0.4 },
+      "microAccents": ["gratitude-peak", "warm-eye-smile"],
+      "gaze": "user",
+      "pupil": "soft-dilate"
+    },
+    "greeting": {
+      "label": "问候欢迎",
+      "base": { "browOuterUpLeft": 0.2, "browOuterUpRight": 0.2, "eyeSquintLeft": 0.25, "eyeSquintRight": 0.25, "eyeSmile": 0.14, "eyeLidClose": 0.02, "mouthSmileLeft": 0.42, "mouthSmileRight": 0.42 },
+      "microAccents": ["brief-brighten"],
+      "gaze": "user",
+      "pupil": "soft-dilate"
+    },
+    "thinking": {
+      "label": "思考",
+      "base": { "browOuterUpLeft": 0.38, "browOuterUpRight": 0.15, "eyeSquintLeft": 0.22, "eyeSquintRight": 0.18, "eyeLidClose": 0.12, "mouthPucker": 0.18 },
+      "microAccents": ["single-brow-emphasis", "thinking-squint"],
+      "gaze": "side-down",
+      "pupil": "event-constrict"
+    },
+    "curious": {
+      "label": "好奇疑问",
+      "base": { "browInnerUp": 0.3, "browOuterUpLeft": 0.35, "browOuterUpRight": 0.18, "eyeWideLeft": 0.3, "eyeWideRight": 0.3, "eyeLidClose": 0.03 },
+      "microAccents": ["question-brow", "brief-brighten"],
+      "gaze": "user",
+      "pupil": "event-dilate"
+    },
+    "serious": {
+      "label": "认真",
+      "base": { "browDownLeft": 0.3, "browDownRight": 0.3, "eyeSquintLeft": 0.18, "eyeSquintRight": 0.18, "eyeLidClose": 0.06, "mouthFrownLeft": 0.12, "mouthFrownRight": 0.12 },
+      "microAccents": ["firm-brow-peak", "focus-narrow"],
+      "gaze": "user",
+      "pupil": "event-constrict"
+    },
+    "concerned": {
+      "label": "担心关切",
+      "base": { "browInnerUp": 0.55, "eyeSquintLeft": 0.25, "eyeSquintRight": 0.25, "eyeLidClose": 0.12, "mouthFrownLeft": 0.38, "mouthFrownRight": 0.38 },
+      "microAccents": ["concern-peak", "side-down-return"],
+      "gaze": "side-down-return",
+      "pupil": "event-constrict"
+    },
+    "sad": {
+      "label": "难过",
+      "base": { "browInnerUp": 0.72, "eyeSquintLeft": 0.38, "eyeSquintRight": 0.38, "eyeLidClose": 0.25, "mouthFrownLeft": 0.55, "mouthFrownRight": 0.55 },
+      "microAccents": ["sad-eye-settle", "slow-return"],
+      "gaze": "side-down-return",
+      "pupil": "stable"
+    },
+    "shy": {
+      "label": "害羞",
+      "base": { "browInnerUp": 0.58, "eyeSquintLeft": 0.56, "eyeSquintRight": 0.56, "eyeSmile": 0.38, "eyeLidClose": 0.14, "cheekRaiseLeft": 0.42, "cheekRaiseRight": 0.42, "mouthSmileLeft": 0.5, "mouthSmileRight": 0.5, "mouthPucker": 0.12, "blush": 0.35 },
+      "microAccents": ["shy-glance", "shy-smile-peak"],
+      "gaze": "side-down-return",
+      "pupil": "soft-dilate"
+    },
+    "surprised": {
+      "label": "惊讶",
+      "base": { "browInnerUp": 0.5, "browOuterUpLeft": 0.4, "browOuterUpRight": 0.4, "eyeWideLeft": 0.7, "eyeWideRight": 0.7, "jawOpen": 0.18 },
+      "microAccents": ["surprise-peak", "surprise-recover"],
+      "gaze": "user",
+      "pupil": "event-dilate"
+    },
+    "angry": {
+      "label": "生气克制",
+      "base": { "browDownLeft": 0.72, "browDownRight": 0.72, "eyeSquintLeft": 0.34, "eyeSquintRight": 0.34, "eyeLidClose": 0.03, "mouthFrownLeft": 0.5, "mouthFrownRight": 0.5, "mouthClose": 0.18 },
+      "microAccents": ["firm-brow-peak", "focus-narrow"],
+      "gaze": "user",
+      "pupil": "event-constrict"
+    },
+    "apologetic": {
+      "label": "抱歉内疚",
+      "base": { "browInnerUp": 0.48, "eyeSquintLeft": 0.22, "eyeSquintRight": 0.22, "eyeLidClose": 0.14, "mouthFrownLeft": 0.3, "mouthFrownRight": 0.3 },
+      "microAccents": ["apology-dip", "user-return"],
+      "gaze": "side-down-return",
+      "pupil": "stable"
+    },
+    "confident": {
+      "label": "自信坚定",
+      "base": { "browDownLeft": 0.22, "browDownRight": 0.22, "eyeSquintLeft": 0.2, "eyeSquintRight": 0.2, "eyeLidClose": 0.03, "mouthSmileLeft": 0.2, "mouthSmileRight": 0.2 },
+      "microAccents": ["firm-brow-peak", "subtle-smile-peak"],
+      "gaze": "user",
+      "pupil": "stable"
+    },
+    "playful": {
+      "label": "俏皮",
+      "base": { "browOuterUpLeft": 0.32, "browOuterUpRight": 0.16, "eyeSquintLeft": 0.25, "eyeSquintRight": 0.18, "eyeLidClose": 0.02, "mouthSmileLeft": 0.32, "mouthSmileRight": 0.24 },
+      "microAccents": ["playful-asymmetry", "quick-happy-squint"],
+      "gaze": "user",
+      "pupil": "soft-dilate"
+    },
+    "loving": {
+      "label": "喜欢亲近",
+      "base": { "browInnerUp": 0.32, "eyeSquintLeft": 0.5, "eyeSquintRight": 0.5, "eyeSmile": 0.5, "eyeLidClose": 0.04, "cheekRaiseLeft": 0.3, "cheekRaiseRight": 0.3, "mouthSmileLeft": 0.66, "mouthSmileRight": 0.66, "blush": 0.25 },
+      "microAccents": ["warm-eye-smile", "affection-peak"],
+      "gaze": "user",
+      "pupil": "soft-dilate"
+    },
+    "delighted": {
+      "label": "开怀大笑",
+      "base": { "browOuterUpLeft": 0.5, "browOuterUpRight": 0.5, "eyeSquintLeft": 0.78, "eyeSquintRight": 0.78, "eyeSmile": 0.85, "cheekRaiseLeft": 0.7, "cheekRaiseRight": 0.7, "mouthSmileLeft": 1.0, "mouthSmileRight": 1.0, "jawOpen": 0.2 },
+      "microAccents": ["warm-eye-smile", "brighten-peak"],
+      "gaze": "user",
+      "pupil": "event-dilate"
+    },
+    "shocked": {
+      "label": "强烈震惊",
+      "base": { "browInnerUp": 0.88, "browOuterUpLeft": 0.78, "browOuterUpRight": 0.78, "eyeWideLeft": 1.0, "eyeWideRight": 1.0, "mouthStretchLeft": 0.58, "mouthStretchRight": 0.58, "jawOpen": 0.48 },
+      "microAccents": ["surprise-peak", "surprise-recover"],
+      "gaze": "user",
+      "pupil": "event-dilate"
+    },
+    "furious": {
+      "label": "暴怒",
+      "base": { "browDownLeft": 1.0, "browDownRight": 1.0, "eyeSquintLeft": 0.66, "eyeSquintRight": 0.66, "mouthFrownLeft": 0.82, "mouthFrownRight": 0.82, "mouthStretchLeft": 0.32, "mouthStretchRight": 0.32, "mouthClose": 0.42 },
+      "microAccents": ["firm-brow-peak", "focus-narrow"],
+      "gaze": "user",
+      "pupil": "event-constrict"
+    },
+    "heartbroken": {
+      "label": "心碎委屈",
+      "base": { "browInnerUp": 1.0, "eyeSquintLeft": 0.62, "eyeSquintRight": 0.62, "eyeLidClose": 0.38, "cheekRaiseLeft": 0.24, "cheekRaiseRight": 0.24, "mouthFrownLeft": 0.9, "mouthFrownRight": 0.9, "tears": 0.18 },
+      "microAccents": ["sad-eye-settle", "slow-return"],
+      "gaze": "side-down-return",
+      "pupil": "stable"
+    },
+    "skeptical": {
+      "label": "怀疑审视",
+      "base": { "browOuterUpLeft": 0.52, "browOuterUpRight": 0.52, "browDownLeft": 0.2, "browDownRight": 0.2, "eyeSquintLeft": 0.56, "eyeSquintRight": 0.56, "mouthFrownLeft": 0.24, "mouthFrownRight": 0.24, "mouthPucker": 0.34 },
+      "microAccents": ["question-brow", "thinking-squint"],
+      "gaze": "side-down",
+      "pupil": "event-constrict"
+    },
+    "embarrassed": {
+      "label": "窘迫脸红",
+      "base": { "browInnerUp": 0.58, "eyeSquintLeft": 0.68, "eyeSquintRight": 0.68, "eyeSmile": 0.38, "cheekRaiseLeft": 0.42, "cheekRaiseRight": 0.42, "mouthSmileLeft": 0.55, "mouthSmileRight": 0.55, "mouthPucker": 0.18, "blush": 0.35 },
+      "microAccents": ["shy-glance", "shy-smile-peak"],
+      "gaze": "side-down-return",
+      "pupil": "soft-dilate"
+    }
+  },
+  "microAccents": {
+    "soft-focus": { "channels": { "eyeSquintLeft": 0.03, "eyeSquintRight": 0.025 } },
+    "half-blink": { "channels": { "blink": 0.24 } },
+    "subtle-brow-shift": { "channels": { "browOuterUpLeft": 0.035 } },
+    "single-brow-emphasis": { "channels": { "browOuterUpLeft": 0.14, "browOuterUpRight": 0.025 } },
+    "soft-squint-emphasis": { "channels": { "eyeSquintLeft": 0.08, "eyeSquintRight": 0.08 } },
+    "warm-eye-smile": { "channels": { "eyeSquintLeft": 0.12, "eyeSquintRight": 0.12, "cheekRaiseLeft": 0.08, "cheekRaiseRight": 0.08 } },
+    "brief-brighten": { "channels": { "browInnerUp": 0.1, "eyeWideLeft": 0.1, "eyeWideRight": 0.1 } },
+    "brighten-peak": { "channels": { "browInnerUp": 0.16, "eyeWideLeft": 0.16, "eyeWideRight": 0.16 } },
+    "quick-happy-squint": { "channels": { "eyeSquintLeft": 0.18, "eyeSquintRight": 0.18 } },
+    "gratitude-peak": { "channels": { "browInnerUp": 0.12, "mouthSmileLeft": 0.15, "mouthSmileRight": 0.15 } },
+    "thinking-squint": { "channels": { "eyeSquintLeft": 0.14, "eyeSquintRight": 0.06 } },
+    "question-brow": { "channels": { "browOuterUpLeft": 0.2, "browOuterUpRight": 0.05 } },
+    "firm-brow-peak": { "channels": { "browDownLeft": 0.2, "browDownRight": 0.2 } },
+    "focus-narrow": { "channels": { "eyeSquintLeft": 0.1, "eyeSquintRight": 0.1 } },
+    "concern-peak": { "channels": { "browInnerUp": 0.22, "mouthFrownLeft": 0.1, "mouthFrownRight": 0.1 } },
+    "side-down-return": { "channels": {}, "gaze": "side-down-return" },
+    "sad-eye-settle": { "channels": { "browInnerUp": 0.18, "eyeSquintLeft": 0.12, "eyeSquintRight": 0.12 } },
+    "slow-return": { "channels": {}, "exitMs": 700 },
+    "shy-glance": { "channels": { "eyeSquintLeft": 0.08, "eyeSquintRight": 0.08, "blush": 0.1 }, "gaze": "side-down-return" },
+    "shy-smile-peak": { "channels": { "mouthSmileLeft": 0.12, "mouthSmileRight": 0.12, "blush": 0.12 } },
+    "surprise-peak": { "channels": { "browInnerUp": 0.22, "eyeWideLeft": 0.24, "eyeWideRight": 0.24 } },
+    "surprise-recover": { "channels": { "eyeWideLeft": 0.08, "eyeWideRight": 0.08 }, "exitMs": 360 },
+    "apology-dip": { "channels": { "browInnerUp": 0.16, "mouthFrownLeft": 0.08, "mouthFrownRight": 0.08 }, "gaze": "side-down" },
+    "user-return": { "channels": {}, "gaze": "user" },
+    "subtle-smile-peak": { "channels": { "mouthSmileLeft": 0.1, "mouthSmileRight": 0.1 } },
+    "playful-asymmetry": { "channels": { "browOuterUpLeft": 0.13, "eyeSquintRight": 0.08, "mouthSmileLeft": 0.12 } },
+    "affection-peak": { "channels": { "eyeSquintLeft": 0.1, "eyeSquintRight": 0.1, "mouthSmileLeft": 0.12, "mouthSmileRight": 0.12, "blush": 0.08 } }
+  },
+  "eventEffects": {
+    "blush": { "defaultMax": 0.35, "eventOnly": true },
+    "tears": { "defaultMax": 0.12, "eventOnly": true, "autoEnabled": false },
+    "starEyes": { "defaultMax": 0.2, "eventOnly": true, "autoEnabled": false },
+    "heartEyes": { "defaultMax": 0.18, "eventOnly": true, "autoEnabled": false }
+  }
+}

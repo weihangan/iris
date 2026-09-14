@@ -1,0 +1,5 @@
+{
+  "schemaVersion": 1,
+  "description": "MotionPack 生产白名单。只列出通过完整 8 阶段门验收（含视频验收）的 pack-id。运行时生产模式只加载白名单中的动作包。此文件进入 Git，动作资产文件（VMD）不进入 Git。三个待机包为程序化生成（procedural://chat6.0/<pack-id>），无外部 VMD 文件依赖。用户要求（2026-07-19）：视频验收 + 白名单注册保持 false，视频前不得进入生产白名单；测试/本地验收通过 candidate-review 模式启用（见 src/motion/motion-runtime-mode.ts）。",
+  "whitelistedPackIds": []
+}

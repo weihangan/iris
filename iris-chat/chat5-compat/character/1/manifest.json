@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0",
+  "character_id": "1",
+  "distill_method": "template",
+  "sources": [],
+  "input_summary": { "character_name": "示例角色", "source_count": 0, "success_count": 0 }
+}

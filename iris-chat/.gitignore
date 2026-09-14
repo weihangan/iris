@@ -1,0 +1,36 @@
+# Dependencies and generated output
+node_modules/
+dist/
+out/
+build/
+coverage/
+test-results/
+playwright-report/
+*.log
+
+# Local secrets and user/runtime data
+.env
+.env.*
+!.env.example
+data/
+**/api_settings.json
+userData/
+cache/
+logs/
+temp/
+
+# Large runtimes are linked or packaged later
+python_env_cpu/
+python_env_gpu/
+GPT-SoVITS-lite/
+
+# The downloaded Selena model is local-only until its README/license is recovered
+/赛琳娜 希声/
+/秧秧/
+
+# Local evidence artifacts that may contain screenshots or machine paths
+docs/evidence/*.png
+docs/evidence/*.jpg
+docs/evidence/*.webp
+docs/evidence/*.log
+.chatx2-build-sequence

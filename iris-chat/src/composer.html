@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>ChatX2 Composer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      -webkit-app-region: drag;
+    }
+    #container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: rgba(26, 29, 35, 0.92);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(80, 83, 89, 0.4);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 2px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    }
+    #subtitle {
+      min-height: 0;
+      max-height: 120px;
+      padding: 6px 10px;
+      color: #c8c8c8;
+      font-size: 12px;
+      line-height: 1.4;
+      word-break: break-all;
+      overflow-y: auto;
+      visibility: hidden;
+      flex-shrink: 1;
+      -webkit-app-region: drag;
+    }
+    #subtitle.visible { visibility: visible; }
+    #subtitle.mock { color: #ffa500; }
+    #subtitle.error { color: #ff6b6b; }
+    /* 引用用户原话的短语（“……”）降一号，与 Chat 窗口规则一致 */
+    #subtitle .inline-quote { font-size: 0.85em; opacity: 0.82; }
+    #subtitle.speaking {
+      border-left: 2px solid #07c160;
+      padding-left: 8px;
+      animation: pulse-border 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-border {
+      0%, 100% { border-left-color: #07c160; }
+      50% { border-left-color: #06ad56; }
+    }
+    #input-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 6px;
+      flex-shrink: 0;
+      background: rgba(15, 17, 21, 0.6);
+    }
+    input, button, #mic-btn, #chat-btn {
+      -webkit-app-region: no-drag;
+      border: none;
+      outline: none;
+      font-family: inherit;
+    }
+    input {
+      flex: 1;
+      padding: 5px 8px;
+      background: rgba(15, 17, 21, 0.9);
+      border: 1px solid rgba(80, 83, 89, 0.3);
+      border-radius: 4px;
+      color: #e0e0e0;
+      font-size: 12px;
+      min-width: 0;
+    }
+    input:focus { border-color: #07c160; }
+    input::placeholder { color: #6a6d73; }
+    button, #mic-btn, #chat-btn {
+      padding: 5px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    #send {
+      background: #07c160;
+      color: white;
+      min-width: 36px;
+    }
+    #send:hover { background: #06ad56; }
+    #send:active { transform: scale(0.96); }
+    #mic-btn {
+      background: rgba(80, 83, 89, 0.4);
+      color: #9a9da3;
+      width: 28px;
+      min-width: 28px;
+    }
+    #mic-btn:hover { background: rgba(100, 103, 109, 0.5); }
+    #mic-btn.listening {
+      background: #ff6b6b;
+      color: white;
+      animation: mic-pulse 1s ease-in-out infinite;
+    }
+    #mic-btn.transcribing {
+      color: #7db7ff;
+      background: rgba(80, 110, 150, 0.45);
+      cursor: wait;
+    }
+    @keyframes mic-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    #chat-btn {
+      background: rgba(80, 83, 89, 0.4);
+      color: #9a9da3;
+      width: 28px;
+      min-width: 28px;
+    }
+    #chat-btn:hover { background: rgba(100, 103, 109, 0.5); }
+    #mock-badge {
+      display: none;
+      padding: 1px 4px;
+      background: #ffa500;
+      color: #000;
+      border-radius: 2px;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+    }
+    #status-bar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      font-size: 9px;
+      color: #6a6d73;
+      flex-shrink: 0;
+      min-height: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.2s;
+    }
+    #status-bar.visible {
+      max-height: 18px;
+      padding: 2px 6px;
+    }
+    #status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #6a6d73;
+      flex-shrink: 0;
+    }
+    #status-dot.thinking { background: #ffa500; animation: dot-blink 0.8s ease-in-out infinite; }
+    #status-dot.speaking { background: #07c160; }
+    #status-dot.error { background: #ff6b6b; }
+    @keyframes dot-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    #compute-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 2px 6px;
+      background: rgba(15, 17, 21, 0.45);
+      color: #7f838b;
+      font-size: 9px;
+      flex-shrink: 0;
+      -webkit-app-region: no-drag;
+    }
+    .compute-level {
+      padding: 1px 7px;
+      border: 1px solid rgba(110, 115, 125, 0.35);
+      background: rgba(52, 55, 64, 0.65);
+      color: #aeb3bd;
+      font-size: 9px;
+      line-height: 15px;
+    }
+    .compute-level.active {
+      border-color: rgba(80, 190, 130, 0.8);
+      background: rgba(38, 112, 73, 0.75);
+      color: #e9fff2;
+    }
+    .rotation-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      min-width: 0;
+      white-space: nowrap;
+    }
+    .rotation-control input[type="range"] {
+      width: 78px;
+      height: 14px;
+      padding: 0;
+      margin: 0;
+      accent-color: #72b7d8;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+    }
+    .rotation-value {
+      width: 31px;
+      color: #b7c4ce;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="subtitle"></div>
+    <div id="status-bar">
+      <span id="status-dot"></span>
+      <span id="status-text"></span>
+    </div>
+    <div id="input-row">
+      <span id="mock-badge"></span>
+      <button id="chat-btn" title="打开完整聊天窗口" type="button">💬</button>
+      <input id="input" type="text" placeholder="输入消息..." autocomplete="off" />
+      <button id="mic-btn" title="开始本地语音输入（最长30秒）" type="button" aria-label="开始本地语音输入（最长30秒）">🎙</button>
+      <button id="send" type="button">发送</button>
+    </div>
+    <div id="compute-row" title="模型渲染、物理精度和语音动作分析；不降低语音合成算力">
+      <label class="rotation-control" for="model-yaw">
+        <span>左右转动</span>
+        <input id="model-yaw" type="range" min="-45" max="45" step="0.5" value="0" aria-label="左右转动" />
+        <output id="model-yaw-value" class="rotation-value">0°</output>
+      </label>
+      <span>模型算力</span>
+      <button class="compute-level" data-compute-level="low" type="button">省电</button>
+      <button class="compute-level" data-compute-level="medium" type="button">均衡</button>
+      <button class="compute-level" data-compute-level="high" type="button">高</button>
+      <button class="compute-level" data-compute-level="ultra" type="button">极致</button>
+      <label class="rotation-control" for="model-pitch">
+        <span>上下转动</span>
+        <input id="model-pitch" type="range" min="-30" max="30" step="0.5" value="0" aria-label="上下转动" />
+        <output id="model-pitch-value" class="rotation-value">0°</output>
+      </label>
+    </div>
+    <!-- 桌宠窗口控制工具栏 -->
+    <div id="avatar-ctrl-bar" style="display:flex;flex-direction:row;justify-content:center;gap:4px;padding:2px 6px;flex-wrap:nowrap;overflow-x:auto;">
+      <button id="btn-avatar-on-top" title="置于最上层" style="padding:1px 6px;background:rgba(60,60,72,0.6);color:#e0d080;border:1px solid rgba(255,255,255,0.1);border-radius:3px;cursor:pointer;font-size:10px;white-space:nowrap;-webkit-app-region:no-drag;">置顶</button>
+      <button id="btn-avatar-through" title="鼠标穿透（点击穿透桌宠窗口）" style="padding:1px 6px;background:rgba(60,60,72,0.6);color:#a0b0c0;border:1px solid rgba(255,255,255,0.1);border-radius:3px;cursor:pointer;font-size:10px;white-space:nowrap;-webkit-app-region:no-drag;">穿透</button>
+      <button id="btn-avatar-idle" title="待机动作（暂停/恢复自动待机动作）" style="padding:1px 6px;background:rgba(60,60,72,0.6);color:#a0d0a0;border:1px solid rgba(255,255,255,0.1);border-radius:3px;cursor:pointer;font-size:10px;white-space:nowrap;-webkit-app-region:no-drag;">待机</button>
+      <button id="btn-avatar-pose-lock" title="锁定当前身体姿势；口型、表情、视线、呼吸和眨眼继续" style="padding:1px 6px;background:rgba(60,60,72,0.6);color:#c0b0e0;border:1px solid rgba(255,255,255,0.1);border-radius:3px;cursor:pointer;font-size:10px;white-space:nowrap;-webkit-app-region:no-drag;">锁定</button>
+      <button id="btn-avatar-gaze-lock" title="目光锁定屏幕正中前方的假定用户；眼睛紧跟，头颈轻微跟随" style="padding:1px 6px;background:rgba(60,60,72,0.6);color:#9ec8df;border:1px solid rgba(255,255,255,0.1);border-radius:3px;cursor:pointer;font-size:10px;white-space:nowrap;-webkit-app-region:no-drag;">目光锁定</button>
+      <button id="btn-avatar-zoom-in" title="放大模型" style="padding:1px 6px;background:rgba(60,60,72,0.6);color:#a0d0a0;border:1px solid rgba(255,255,255,0.1);border-radius:3px;cursor:pointer;font-size:10px;white-space:nowrap;-webkit-app-region:no-drag;">放大</button>
+      <button id="btn-avatar-zoom-out" title="缩小模型" style="padding:1px 6px;background:rgba(60,60,72,0.6);color:#d0a080;border:1px solid rgba(255,255,255,0.1);border-radius:3px;cursor:pointer;font-size:10px;white-space:nowrap;-webkit-app-region:no-drag;">缩小</button>
+      <button id="btn-view-full" title="全身视角" style="padding:1px 6px;background:rgba(80,120,180,0.7);color:#ffffff;border:1px solid rgba(255,255,255,0.1);border-radius:3px;cursor:pointer;font-size:10px;white-space:nowrap;-webkit-app-region:no-drag;">全身</button>
+      <button id="btn-view-half" title="半身视角" style="padding:1px 6px;background:rgba(60,60,72,0.6);color:#b0c0e0;border:1px solid rgba(255,255,255,0.1);border-radius:3px;cursor:pointer;font-size:10px;white-space:nowrap;-webkit-app-region:no-drag;">半身</button>
+      <button id="btn-exit-desktop" title="退出桌宠" style="padding:1px 6px;background:rgba(140,60,60,0.7);color:#ff8a8a;border:1px solid rgba(255,120,120,0.3);border-radius:3px;cursor:pointer;font-size:10px;white-space:nowrap;-webkit-app-region:no-drag;">退出模型</button>
+    </div>
+  </div>
+  <script type="module" src="./composer-renderer.ts"></script>
+</body>
+</html>

@@ -1,0 +1,2465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 默认动态渐变背景（自主流动的能量系统） -->
+    <div id="default-bg" class="default-bg">
+      <div class="orb-1"></div>
+      <div class="orb-2"></div>
+      <div class="orb-3"></div>
+      <div class="orb-4"></div>
+      <div class="flow-band flow-band-1"></div>
+      <div class="flow-band flow-band-2"></div>
+      <div class="particles"></div>
+      <div class="top-fade"></div>
+      <div class="bottom-fade"></div>
+    </div>
+    <div id="page-chat" class="page active">
+      <div class="chat-container">
+        <!-- 触屏涟漪层：放在 chat-container 内部，始终在最上层，不会被自定义背景遮挡 -->
+        <div class="touch-ripple-layer"></div>
+        <div class="header-trigger-zone" id="header-trigger-zone"></div>
+        <div class="chat-header" id="chat-header">
+          <div class="header-left">
+            <button id="btn-back" class="header-btn icon-btn ripple-container" title="设置">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.6 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+            </button>
+            <button id="btn-voice-toggle" class="header-btn icon-btn voice-toggle-btn" title="语音服务开关">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 5V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            </button>
+            <!-- GPU/CPU 切换（伸缩框内，同 chat5.2 风格） -->
+            <div class="header-device-switch" id="header-device-switch">
+              <button id="header-device-gpu" class="header-device-btn" data-device="gpu" title="GPU 加速合成">GPU</button>
+              <button id="header-device-cpu" class="header-device-btn" data-device="cpu" title="CPU 稳定合成">CPU</button>
+            </div>
+            <button id="btn-voice-autoplay" class="header-btn icon-btn voice-autoplay-btn" title="自动播放最新语音：关闭" aria-pressed="false">
+              <svg class="voice-autoplay-icon voice-autoplay-icon-on" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9v6h4l5 4V5l-5 4H5z"/><path d="M18 9.5a4 4 0 0 1 0 5"/><path d="M19 5.5a9 9 0 0 1 0 13"/></svg>
+              <svg class="voice-autoplay-icon voice-autoplay-icon-off" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9v6h4l5 4V5l-5 4H5z"/><path d="M18 9.5a4 4 0 0 1 0 5"/><path d="M3 3l18 18"/></svg>
+            </button>
+            <button id="btn-voice-clone" class="header-btn icon-btn" title="语音克隆训练">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6"/><path d="M5 7l4 3"/><path d="M19 7l-4 3"/><path d="M5 17l4-3"/><path d="M19 17l-4-3"/><path d="M12 16v6"/><circle cx="12" cy="12" r="2"/></svg>
+            </button>
+            <button id="btn-text-color" class="header-btn icon-btn" title="聊天字体颜色">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+            </button>
+          </div>
+          <div class="header-center">
+            <span id="char-name">赛琳娜</span>
+          </div>
+          <div class="header-right">
+            <button id="btn-voice-switch" class="header-btn icon-btn ripple-container" title="切换语音">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h2l2-6 4 12 4-12 2 6h4"/></svg>
+            </button>
+            <button id="btn-char-switch" class="header-btn icon-btn ripple-container" title="切换角色">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7h6a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1l-2-2"/><path d="M14 17H8a2 2 0 0 1-2-2v-1"/><circle cx="6" cy="9" r="3"/><path d="M18 14l-2-2 2-2"/><path d="M16 12h2"/><path d="M9 6h5l2 2"/></svg>
+            </button>
+            <button id="btn-rebuild-index-quick" class="header-btn icon-btn ripple-container" title="重建历史索引">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"/><path d="M3.51 9a9 9 0 1 1 .46 5.5"/><polyline points="3 2 9 8 3 14"/></svg>
+            </button>
+            <button id="btn-clear" class="header-btn icon-btn ripple-container" title="清空聊天">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h10"/><path d="M7 13h6"/><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 3v4"/><path d="M17 3v4"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="chat-area" class="chat-area">
+          <div id="messages" class="messages"></div>
+        </div>
+
+        <div class="input-area">
+          <div class="input-wrapper">
+            <button id="btn-plus" class="plus-btn" title="发送图片">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <textarea id="msg-input" placeholder="输入消息..." rows="1"></textarea>
+            <button id="btn-voice-input" class="voice-input-btn" type="button" title="开始本地语音输入（最长30秒）" aria-label="开始本地语音输入（最长30秒）" aria-pressed="false">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="17" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+            </button>
+            <button id="btn-kaomoji" class="emoji-btn" title="颜文字">
+              <span style="font-size:14px;">(^_^)</span>
+            </button>
+            <button id="btn-send" class="send-btn ripple-container">发送</button>
+            <input type="file" id="file-image" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;left:-9999px;">
+          </div>
+          <!-- 颜文字面板 -->
+          <div id="kaomoji-panel" class="emoji-panel" style="display:none;">
+            <div class="emoji-panel-tabs">
+              <button class="emoji-tab active" data-cat="happy">开心</button>
+              <button class="emoji-tab" data-cat="sad">难过</button>
+              <button class="emoji-tab" data-cat="love">爱心</button>
+              <button class="emoji-tab" data-cat="angry">生气</button>
+              <button class="emoji-tab" data-cat="shy">害羞</button>
+              <button class="emoji-tab" data-cat="greeting">问候</button>
+              <button class="emoji-tab" data-cat="comfort">安慰</button>
+              <button class="emoji-tab" data-cat="confused">疑惑</button>
+              <button class="emoji-tab" data-cat="other">其他</button>
+            </div>
+            <div id="kaomoji-list" class="emoji-list"></div>
+          </div>
+          <div id="image-preview-bar" class="image-preview-bar" style="display:none;">
+            <div class="preview-item">
+              <img id="preview-img" src="" alt="预览">
+              <button id="btn-remove-preview" class="remove-preview-btn">&times;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="page-settings" class="page">
+      <div class="settings-container">
+        <div class="settings-header">
+          <button id="btn-settings-back" class="header-btn icon-btn ripple-container" title="返回聊天">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <span class="settings-title">设置</span>
+          <div class="settings-bg-opacity-control" style="display:flex;align-items:center;gap:8px;padding:0 10px;min-width:200px;">
+            <span style="font-size:11px;color:var(--text-muted, rgba(200,195,225,0.42));white-space:nowrap;">底色</span>
+            <input type="range" id="set-settings-bg-opacity" min="0.2" max="1" step="0.05" value="0.78" style="flex:1;width:100px;-webkit-appearance:none;appearance:none;height:2px;border-radius:1px;outline:none;cursor:pointer;background:linear-gradient(90deg, rgba(0,229,255,0.7) 0%, rgba(124,77,255,0.7) var(--fill,50%), rgba(60,80,100,0.4) var(--fill,50%), rgba(60,80,100,0.4) 100%);">
+            <span id="val-settings-bg-opacity" style="font-size:11px;color:#4dd9ff;min-width:32px;text-align:right;">78%</span>
+          </div>
+        </div>
+
+        <div class="settings-scroll">
+          <div class="settings-section">
+            <div class="section-title">API 配置</div>
+            <div class="setting-item">
+              <label>模型</label>
+              <select id="set-provider">
+                <option value="deepseek">DeepSeek</option>
+                <option value="glm">GLM / 智谱</option>
+                <option value="doubao">Doubao / 火山方舟</option>
+                <option value="kimi">Kimi / Moonshot</option>
+                <option value="openai">OpenAI</option>
+                <option value="qwen">Qwen / 通义千问</option>
+                <option value="siliconflow">SiliconFlow / 硅基流动</option>
+                <option value="claude">Claude / Anthropic</option>
+                <option value="agnes">Agnes AI</option>
+                <option value="custom">自定义 API</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>子模型</label>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <select id="set-submodel" style="flex:1;">
+                  <option value="">手动输入 / 使用默认</option>
+                </select>
+                <button id="btn-sync-models" class="settings-action-btn" style="padding:8px 10px;font-size:12px;white-space:nowrap;" title="从API获取最新模型列表">同步模型</button>
+              </div>
+            </div>
+            <div class="setting-item">
+              <label>能力偏好</label>
+              <select id="set-capability">
+                <option value="">自动（由 API 决定）</option>
+                <option value="flash">Flash / 快速模型</option>
+                <option value="fast">Fast / 低延迟</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>思考强度</label>
+              <select id="set-reasoning">
+                <option value="">自动</option>
+                <option value="low">低</option>
+                <option value="medium">中</option>
+                <option value="high">高</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>API Key</label>
+              <input type="password" id="set-apikey" placeholder="输入 API Key" autocomplete="off">
+            </div>
+            <div id="provider-website" style="margin:4px 0 8px;font-size:12px;"></div>
+            <div id="sync-status" class="api-status" style="margin-bottom:8px;"></div>
+            <button id="btn-save-api" class="settings-save-btn ripple-container sweep-light">保存 API 配置</button>
+            <div id="api-status" class="api-status"></div>
+            <div style="margin-top:12px;border-top:1px solid #f0f0f0;padding-top:12px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span style="font-size:13px;color:#666;">模型列表管理</span>
+                <div style="display:flex;gap:6px;">
+                  <button id="btn-edit-models" class="settings-action-btn" style="padding:4px 10px;font-size:12px;">编辑模型</button>
+                  <button id="btn-reset-registry" class="settings-action-btn" style="padding:4px 10px;font-size:12px;color:#ff4d4f;">重置默认</button>
+                </div>
+              </div>
+              <div id="edit-models-panel" style="display:none;">
+                <div class="setting-item">
+                  <label>官网地址</label>
+                  <input type="text" id="edit-website" placeholder="Provider官网URL">
+                </div>
+                <div class="setting-item">
+                  <label>默认Base URL</label>
+                  <input type="text" id="edit-baseurl" placeholder="API Base URL">
+                </div>
+                <div class="setting-item">
+                  <label>默认模型</label>
+                  <input type="text" id="edit-default-model" placeholder="默认模型名称">
+                </div>
+                <div class="setting-item">
+                  <label>模型列表 <span style="font-size:11px;color:#999;">每行一个模型ID</span></label>
+                  <textarea id="edit-models-list" class="char-textarea" rows="5" placeholder="每行一个模型名称&#10;例如:&#10;gpt-4o-mini&#10;gpt-4o&#10;o1-mini"></textarea>
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <button id="btn-save-models" class="settings-action-btn" style="flex:1;">保存模型列表</button>
+                  <button id="btn-cancel-models" class="settings-action-btn" style="flex:1;">取消</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="section-title">聊天方式</div>
+            <div class="conversation-mode-options" role="radiogroup" aria-label="聊天方式">
+              <label class="conversation-mode-option">
+                <input type="radio" name="conversation-mode" value="immersive" checked>
+                <span><strong>面对面互动</strong><small>保留当前的场景、动作和陪伴感</small></span>
+              </label>
+              <label class="conversation-mode-option">
+                <input type="radio" name="conversation-mode" value="remote_chat">
+                <span><strong>手机聊天</strong><small>像微信或 QQ，双方不在同一地点，不写动作旁白</small></span>
+              </label>
+            </div>
+            <button id="btn-save-conversation-mode" class="settings-save-btn ripple-container sweep-light">保存聊天方式</button>
+            <div id="conversation-mode-status" class="api-status"></div>
+          </div>
+
+          <div class="settings-section">
+            <div class="section-title">角色信息</div>
+            <div id="current-char-label" style="font-size:12px;color:#999;margin-bottom:10px;"></div>
+            <div class="setting-item">
+              <label>角色名称</label>
+              <input type="text" id="set-char-name" placeholder="角色名称">
+            </div>
+            <div class="setting-item">
+              <label>身份</label>
+              <input type="text" id="set-char-role" placeholder="角色身份">
+            </div>
+            <div class="setting-item">
+              <label>用户称呼</label>
+              <input type="text" id="set-char-title" placeholder="对用户的称呼">
+            </div>
+            <div class="setting-item" style="flex-direction:column;align-items:stretch;gap:6px;">
+              <label>角色对用户认知 <span style="font-size:11px;color:#999;">（第一优先读取的人物设定）</span></label>
+              <textarea id="set-char-user-cognition" class="char-textarea" rows="3" placeholder="角色眼中用户是谁？默认是游戏/动漫的主角；若创建的角色本身就是主角，可写希望扮演的剧中身份（如：操作者、玩家、监督员），或保留默认。"></textarea>
+              <div style="font-size:11px;color:#888;line-height:1.5;">该字段与"用户称呼"同优先级，作为最高级人物设定注入对话，会覆盖 Skill/character.md 中冲突的描述。</div>
+            </div>
+            <div class="setting-item">
+              <label>风格</label>
+              <input type="text" id="set-char-style" placeholder="对话风格">
+            </div>
+            <div class="setting-item">
+              <label>背景 <span style="font-size:11px;color:#999;">（点击展开编辑，蒸馏后会自动补充）</span></label>
+              <textarea id="set-char-background" class="char-textarea" rows="3" placeholder="角色背景故事" style="display:none;"></textarea>
+              <button id="btn-toggle-bg" class="settings-action-btn" style="font-size:12px;padding:4px 10px;margin-top:4px;">展开编辑</button>
+            </div>
+            <div class="setting-item">
+              <label>性格 <span style="font-size:11px;color:#999;">（蒸馏后会自动补充，含矛盾点）</span></label>
+              <textarea id="set-char-personality" class="char-textarea" rows="3" placeholder="角色性格" style="display:none;"></textarea>
+              <button id="btn-toggle-personality" class="settings-action-btn" style="font-size:12px;padding:4px 10px;margin-top:4px;">展开编辑</button>
+            </div>
+            <div class="setting-item">
+              <label>说话风格 <span style="font-size:11px;color:#999;">（蒸馏后会自动补充）</span></label>
+              <textarea id="set-char-speaking" class="char-textarea" rows="3" placeholder="说话风格" style="display:none;"></textarea>
+              <button id="btn-toggle-speaking" class="settings-action-btn" style="font-size:12px;padding:4px 10px;margin-top:4px;">展开编辑</button>
+            </div>
+            <div class="setting-item">
+              <label>喜好 <span style="font-size:11px;color:#999;">（蒸馏后会自动补充）</span></label>
+              <textarea id="set-char-likes" class="char-textarea" rows="3" placeholder="角色喜好" style="display:none;"></textarea>
+              <button id="btn-toggle-likes" class="settings-action-btn" style="font-size:12px;padding:4px 10px;margin-top:4px;">展开编辑</button>
+            </div>
+            <div class="setting-item">
+              <label>故事 <span style="font-size:11px;color:#999;">（蒸馏后会自动补充，含故事线与转折）</span></label>
+              <textarea id="set-char-story" class="char-textarea" rows="3" placeholder="角色故事" style="display:none;"></textarea>
+              <button id="btn-toggle-story" class="settings-action-btn" style="font-size:12px;padding:4px 10px;margin-top:4px;">展开编辑</button>
+            </div>
+            <button id="btn-save-character" class="settings-save-btn ripple-container sweep-light">保存角色信息</button>
+          </div>
+
+          <div class="settings-section">
+            <div class="section-title">知识库</div>
+
+            <div class="subsection-title">补充设定</div>
+            <div class="setting-item">
+              <textarea id="set-supplementary" class="char-textarea" rows="4" placeholder="手动输入补充的基础设定，会作为AI的背景知识"></textarea>
+            </div>
+            <button id="btn-save-supplementary" class="settings-action-btn" style="width:100%;margin-bottom:12px;">保存补充设定</button>
+
+            <div class="subsection-title">角色Skill <span style="font-size:11px;color:#999;">（基于女娲·Skill造人术框架，提炼角色思维操作系统；生成时会自动补充下方背景/性格/说话风格/喜好/故事字段）</span></div>
+
+            <!-- 蒸馏方式切换 -->
+            <div style="display:flex;gap:6px;margin-bottom:8px;">
+              <button id="tab-distill-web" class="settings-action-btn" style="flex:1;background:#4a90d9;color:#fff;">网络搜索蒸馏</button>
+              <button id="tab-distill-custom" class="settings-action-btn" style="flex:1;">自定义导入蒸馏</button>
+            </div>
+
+            <!-- 网络搜索蒸馏面板 -->
+            <div id="panel-distill-web" class="distill-panel">
+              <div style="font-size:12px;color:#999;margin-bottom:8px;">通过网络搜索游戏/动漫/现实人物的资料，生成聊天Skill。支持萌娘百科、Wikipedia、BWIKI、DuckDuckGo、百度百科、知乎等多源检索。</div>
+              <div class="setting-item">
+                <label>人物名称 <span style="font-size:11px;color:#999;">（留空使用当前角色名）</span></label>
+                <input id="distill-web-name" type="text" placeholder="如：秧秧 / 钢铁侠 / 苏轼">
+              </div>
+              <div class="setting-item">
+                <label>人物类型</label>
+                <select id="distill-web-type">
+                  <option value="auto">自动检测</option>
+                  <option value="game">游戏角色</option>
+                  <option value="anime">动漫角色</option>
+                  <option value="real">现实人物</option>
+                </select>
+              </div>
+              <div class="setting-item">
+                <label>搜索提示词 <span style="font-size:11px;color:#999;">（可选，帮助精准定位，影响所有默认搜索源）</span></label>
+                <input id="distill-web-hints" type="text" placeholder="如：李白 唐 诗人 或 朱元璋 明 NOT 电视剧">
+                <div style="font-size:11px;color:#999;margin-top:2px;line-height:1.5;">
+                  空格分隔=AND（必须包含）；OR=任一匹配；NOT=排除。如：<code>朱元璋 明 NOT 电视剧</code> = 搜索含"朱元璋"和"明"但排除"电视剧"的内容
+                </div>
+              </div>
+              <div id="distill-web-status" class="api-status"></div>
+              <button id="btn-distill-web" class="settings-action-btn ripple-container sweep-light" style="width:100%;background:#4a90d9;color:#fff;">开始蒸馏</button>
+            </div>
+
+            <!-- 自定义导入蒸馏面板 -->
+            <div id="panel-distill-custom" class="distill-panel" style="display:none;">
+              <div style="font-size:12px;color:#999;margin-bottom:8px;">通过导入人物性格描述、聊天记录、朋友圈等真实素材，还原人物的聊天习惯。</div>
+
+              <div class="setting-item">
+                <label>人物名称 <span style="font-size:11px;color:#999;">（留空使用当前角色名）</span></label>
+                <input id="distill-custom-name" type="text" placeholder="人物姓名">
+              </div>
+              <div class="setting-item">
+                <label>人物称谓 <span style="font-size:11px;color:#999;">（你如何称呼此人）</span></label>
+                <input id="distill-custom-relationship" type="text" placeholder="如：老爸 / 闺蜜 / 张老师">
+              </div>
+              <div class="setting-item">
+                <label>人物语气倾向</label>
+                <select id="distill-custom-purpose">
+                  <option value="warm">温柔（温暖关怀的语气）</option>
+                  <option value="conflict">矛盾（有张力、更真实）</option>
+                  <option value="neutral">自然（如实还原，不加修饰）</option>
+                </select>
+              </div>
+              <div class="setting-item">
+                <label>性格描述 <span style="font-size:11px;color:#999;">（此人的性格特点、为人处世方式）</span></label>
+                <textarea id="distill-custom-personality" class="char-textarea" rows="4" placeholder="描述此人的性格，如：温和、爱开玩笑、喜欢照顾人、有点固执但很善良..."></textarea>
+              </div>
+              <div class="setting-item">
+                <label>聊天记录 <span style="font-size:11px;color:#999;">（粘贴此人的真实聊天记录，最能反映说话习惯）</span></label>
+                <textarea id="distill-custom-chat" class="char-textarea" rows="8" placeholder="粘贴聊天记录，如：&#10;他：今天天气不错啊&#10;他：记得吃饭&#10;他：哈哈哈那个太搞笑了&#10;&#10;支持微信/QQ导出的文本格式"></textarea>
+              </div>
+              <div class="setting-item">
+                <label>朋友圈/动态 <span style="font-size:11px;color:#999;">（此人发过的朋友圈、微博、动态等内容）</span></label>
+                <textarea id="distill-custom-moments" class="char-textarea" rows="5" placeholder="粘贴此人发过的动态内容，每条一行或用空行分隔..."></textarea>
+              </div>
+              <div class="setting-item">
+                <label>其他备注 <span style="font-size:11px;color:#999;">（口头禅、喜好、习惯、回忆等任何补充）</span></label>
+                <textarea id="distill-custom-notes" class="char-textarea" rows="4" placeholder="如：爱喝绿茶、喜欢下棋、常说'没事没事'、退休前是老师..."></textarea>
+              </div>
+              <div id="distill-custom-status" class="api-status"></div>
+              <button id="btn-distill-custom" class="settings-action-btn ripple-container sweep-light" style="width:100%;background:#27ae60;color:#fff;">开始蒸馏</button>
+            </div>
+
+            <div id="distill-manifest-info" style="font-size:12px;color:#666;margin:8px 0;padding:6px 8px;background:rgba(0,0,0,0.03);border-radius:6px;display:none;"></div>
+            <div class="setting-item" style="display:flex;gap:6px;margin-top:8px;">
+              <button id="btn-rollback-skill" class="settings-action-btn" style="width:auto;padding:0 12px;color:#e67e22;">回退</button>
+            </div>
+            <div class="setting-item">
+              <label>Skill内容 <span style="font-size:11px;color:#999;">（蒸馏后自动填充，也可手动编辑）</span></label>
+              <textarea id="set-skill" class="char-textarea" rows="8" placeholder="点击上方「开始蒸馏」自动生成，或手动输入Skill内容..."></textarea>
+            </div>
+            <button id="btn-save-skill" class="settings-action-btn" style="width:100%;margin-bottom:12px;">保存Skill</button>
+
+            <div class="subsection-title">资料网址</div>
+            <div style="font-size:12px;color:rgba(216,210,235,0.65);margin-bottom:10px;padding:10px 12px;background:transparent;border-radius:8px;line-height:1.7;">
+              <strong style="color:rgba(255,255,255,0.92);">蒸馏时自动搜索以下来源（无需手动添加）：</strong><br>
+              <span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);color:#4dd9ff;border-radius:4px;font-size:11px;">萌娘百科</span>
+              <span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);color:#4dd9ff;border-radius:4px;font-size:11px;">Wikipedia中+英</span>
+              <span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);color:#4dd9ff;border-radius:4px;font-size:11px;">BWIKI</span>
+              <span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);color:#4dd9ff;border-radius:4px;font-size:11px;">DuckDuckGo</span>
+              <span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);color:#4dd9ff;border-radius:4px;font-size:11px;">百度百科</span>
+              <span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);color:#4dd9ff;border-radius:4px;font-size:11px;">知乎</span>
+              <span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);color:#4dd9ff;border-radius:4px;font-size:11px;">微博</span>
+              <br><span style="color:rgba(200,195,225,0.42);font-size:11px;">点击「生成/更新角色Skill」或「开始网络搜索蒸馏」即可自动搜索以上全部来源</span>
+            </div>
+            <div id="knowledge-urls-list" style="margin-bottom:8px;"></div>
+            <div style="font-size:12px;color:#888;margin-bottom:6px;border-top:1px dashed #e0e0e0;padding-top:8px;">添加额外资料网址（补充默认搜索源未覆盖的内容）：</div>
+            <div class="setting-item" style="gap:6px;">
+              <select id="add-url-type" style="width:80px;">
+                <option value="web">网页</option>
+                <option value="search">搜索页</option>
+                <option value="api">API</option>
+              </select>
+              <input type="text" id="add-url-wiki" placeholder="Wiki前缀" style="width:90px;display:none;" title="如wutheringwaves(鸣潮)、zspms(战双)">
+              <input type="text" id="add-url-label" placeholder="标签名" style="width:70px;">
+              <input type="text" id="add-url-value" placeholder="填URL地址" style="flex:1;">
+              <button id="btn-add-url" class="settings-action-btn" style="padding:4px 10px;font-size:12px;" disabled>添加</button>
+            </div>
+            <div style="font-size:11px;color:#999;margin-top:4px;padding:6px 8px;background:rgba(0,0,0,0.03);border-radius:4px;line-height:1.6;">
+              <strong>网页</strong>：填可直接访问的URL，如 https://wiki.kurobbs.com/pns/露西亚<br>
+              <strong>搜索页</strong>：填搜索主页URL，蒸馏时自动拼接角色名。如：抖音 https://www.douyin.com/search/ 、B站 https://search.bilibili.com/all?keyword= 、贴吧 https://tieba.baidu.com/f?kw=<br>
+              <strong>API</strong>：填返回JSON数据的接口URL
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="section-title">数据源登录</div>
+
+            <div class="subsection-title">库洛Wiki <span style="font-size:11px;color:#999;">（战双帕弥什/鸣潮角色资料最全来源，获取方法：打开网站→登录→F12→Application→Cookies→复制user_token）</span></div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+              <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <input type="checkbox" id="kuro-enabled" checked style="margin:0;"> 启用库洛Wiki
+              </label>
+              <select id="kuro-game-type" style="font-size:12px;padding:2px 8px;border-radius:4px;border:1px solid #ddd;">
+                <option value="pns">战双帕弥什</option>
+                <option value="mc">鸣潮</option>
+              </select>
+            </div>
+            <div id="kuro-status" style="font-size:12px;margin-bottom:8px;padding:6px 10px;background:rgba(0,0,0,0.03);border-radius:6px;">检测中...</div>
+
+            <div id="kuro-login-panel" style="display:none;">
+              <div style="font-size:12px;color:#666;margin-bottom:8px;">手动输入Token登录</div>
+              <div style="font-size:11px;color:#999;margin-bottom:8px;line-height:1.8;padding:8px 10px;background:rgba(0,0,0,0.03);border-radius:6px;">
+                <strong style="color:#555;">获取方法：</strong><br>
+                1. 打开 <a href="https://wiki.kurobbs.com" target="_blank" style="color:#4a90d9;">wiki.kurobbs.com</a> 并登录你的库洛账号<br>
+                2. 按 <kbd style="background:#eee;padding:1px 5px;border-radius:3px;font-size:10px;">F12</kbd> 打开开发者工具<br>
+                3. 点击顶部 <strong>Application</strong>（应用程序）标签页<br>
+                4. 左侧展开 <strong>Cookies</strong> → 点击 <code>wiki.kurobbs.com</code><br>
+                5. 在右侧表格中找到 <code>user_token</code> 行，双击其 Value 列复制整个值<br>
+                6. 粘贴到下方输入框并保存<br>
+                <span style="color:#e67e22;">注意：必须先在库洛Wiki页面登录后才能看到此Cookie</span>
+              </div>
+              <div class="setting-item" style="gap:6px;">
+                <input type="text" id="kuro-token-input" placeholder="粘贴user_token的值" style="flex:1;">
+                <button id="btn-kuro-set-token" class="settings-action-btn" style="padding:6px 12px;font-size:12px;">保存</button>
+              </div>
+              <div style="font-size:11px;color:#999;margin-top:8px;line-height:1.6;">
+                <strong style="color:#555;">获取内容：</strong>登录后蒸馏角色时，将自动从库洛Wiki获取：<br>
+                · <strong>战双帕弥什</strong>：角色词条、主线剧情、间章旧闻、好感剧情、活动剧情、人物档案等<br>
+                · <strong>鸣潮</strong>：共鸣者（角色介绍）、潮汐任务剧情、伴星任务剧情、活动任务剧情等<br>
+                系统会根据角色信息自动判断属于哪个游戏，无需手动选择。
+              </div>
+            </div>
+
+            <!-- 已登录面板 -->
+            <div id="kuro-logged-in-panel" style="display:none;">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <span style="font-size:13px;color:#07c160;">已登录</span>
+                <div style="display:flex;gap:6px;">
+                  <button id="btn-kuro-test" class="settings-action-btn" style="padding:4px 10px;font-size:12px;">测试API</button>
+                  <button id="btn-kuro-logout" class="settings-action-btn" style="padding:4px 10px;font-size:12px;color:#ff4d4f;">登出</button>
+                </div>
+              </div>
+              <div id="kuro-test-result" style="font-size:12px;color:#999;margin-top:6px;"></div>
+            </div>
+
+            <div style="border-top:1px dashed #e0e0e0;padding-top:10px;margin-top:12px;">
+              <div class="subsection-title">百度贴吧 <span style="font-size:11px;color:#999;">（无需登录，通过搜索引擎获取）</span></div>
+              <div style="font-size:12px;color:#888;padding:6px 10px;background:rgba(0,0,0,0.03);border-radius:6px;line-height:1.6;">
+                百度贴吧无公开API，直接爬取有严格反爬限制。当前已通过搜狗搜索 <code>site:tieba.baidu.com</code> 间接获取贴吧内容，蒸馏时自动执行，无需额外配置。<br>
+                <span style="color:#999;">如需获取更多贴吧内容，可在「资料网址」中添加贴吧搜索页URL。</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="section-title">对话技能 <span style="font-size:11px;color:#999;">（角色专属，自动注入Prompt）</span></div>
+            <textarea id="conversation-skills-editor" rows="8" style="width:100%;font-size:12px;line-height:1.6;padding:8px;border:1px solid #ddd;border-radius:6px;resize:vertical;font-family:inherit;" placeholder="输入角色专属对话技能规则，如：回复要自然、不要暴露AI身份、使用颜文字等"></textarea>
+            <div style="display:flex;gap:6px;margin-top:6px;align-items:center;">
+              <button id="btn-save-conversation-skills" class="settings-action-btn" style="padding:4px 12px;font-size:12px;">保存</button>
+              <button id="btn-delete-char-skills" class="settings-action-btn" style="padding:4px 12px;font-size:12px;color:#ff4d4f;">删除角色专属</button>
+              <span id="skills-save-hint" style="font-size:11px;color:#07c160;"></span>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="section-title">长期记忆（永久事实）</div>
+            <div style="font-size:11px;color:#888;line-height:1.5;margin-bottom:6px;">点击 ☆ / ★ 设置是否为重要事件。自动识别的生日、重大事件默认带 ★；带 ★ 的记忆不会被压缩清理。</div>
+            <div id="permanent-facts-list" style="margin-bottom:8px;"></div>
+            <div class="setting-item" style="gap:6px;">
+              <input type="text" id="add-fact-input" placeholder="输入长期记忆（添加后可点 ☆ 标记重要）" style="flex:1;">
+              <button id="btn-add-fact" class="settings-action-btn" style="padding:4px 10px;font-size:12px;">添加</button>
+            </div>
+          </div>
+
+          <!-- 语音微调面板 -->
+          <div class="settings-section" id="voice-tuning-section" style="display:none;">
+            <div class="section-title">语音微调 <span style="font-size:11px;color:#999;">（调节音色、情绪、语速）</span></div>
+            <div id="voice-tuning-content">
+              <!-- 默认情感 -->
+              <div class="setting-item" style="margin-bottom:10px;">
+                <label style="min-width:70px;">默认情感</label>
+                <select id="vt-default-emotion" style="flex:1;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+                  <option value="auto">自动识别</option>
+                </select>
+              </div>
+              <!-- 情感参数卡片 -->
+              <div id="vt-emotion-cards" style="display:flex;flex-direction:column;gap:8px;"></div>
+              <!-- 全局覆盖（科技感暗底 UI） -->
+              <style>
+                /* === 科技感暗底容器 === */
+                .vt-card{
+                  margin-top:14px;padding:14px 14px 10px;
+                  background:linear-gradient(180deg,#1a2332 0%,#0f1822 100%);
+                  border-radius:10px;border:1px solid rgba(64,224,255,0.18);
+                  box-shadow:inset 0 1px 0 rgba(64,224,255,0.08),0 2px 8px rgba(0,0,0,0.3);
+                }
+                .vt-card-title{
+                  font-size:11px;font-weight:600;color:#40e0ff;margin-bottom:14px;
+                  letter-spacing:2px;text-transform:uppercase;
+                  display:flex;align-items:center;gap:8px;
+                }
+                .vt-card-title::before{
+                  content:'';width:4px;height:14px;border-radius:1px;
+                  background:linear-gradient(180deg,#00e5ff,#7c4dff);
+                  box-shadow:0 0 8px rgba(0,229,255,0.6);
+                }
+                /* === 行布局 === */
+                .vt-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;height:24px;}
+                .vt-row:last-of-type{margin-bottom:6px;}
+                .vt-label{
+                  flex:0 0 64px;font-size:11px;color:#8ba3b8;font-weight:500;
+                  letter-spacing:.3px;
+                }
+                .vt-val{
+                  flex:0 0 56px;text-align:right;font-size:11px;font-weight:600;
+                  color:#00e5ff;font-family:'Consolas','Monaco','Courier New',monospace;
+                  font-variant-numeric:tabular-nums;
+                  background:rgba(0,229,255,0.06);padding:2px 6px;border-radius:3px;
+                  border:1px solid rgba(0,229,255,0.15);
+                  transition:all .15s;
+                }
+                .vt-val.active{color:#7c4dff;border-color:rgba(124,77,255,0.4);background:rgba(124,77,255,0.1);}
+                /* === 核心滑块样式（暗底+发光手柄）=== */
+                .vt-slider{
+                  flex:1;-webkit-appearance:none;appearance:none;
+                  height:2px;border-radius:1px;outline:none;cursor:pointer;
+                  background:linear-gradient(90deg,
+                    rgba(0,229,255,0.7) 0%,
+                    rgba(124,77,255,0.7) var(--fill,50%),
+                    rgba(60,80,100,0.4) var(--fill,50%),
+                    rgba(60,80,100,0.4) 100%);
+                }
+                .vt-slider::-webkit-slider-thumb{
+                  -webkit-appearance:none;appearance:none;
+                  width:14px;height:14px;border-radius:50%;
+                  background:#0f1822;border:1.5px solid #00e5ff;
+                  box-shadow:0 0 8px rgba(0,229,255,0.6),inset 0 0 4px rgba(0,229,255,0.3);
+                  cursor:pointer;transition:all .15s ease-out;
+                }
+                .vt-slider:hover::-webkit-slider-thumb{
+                  transform:scale(1.3);
+                  border-color:#7c4dff;
+                  box-shadow:0 0 16px rgba(124,77,255,0.8),0 0 24px rgba(0,229,255,0.4),inset 0 0 6px rgba(124,77,255,0.4);
+                }
+                .vt-slider:active::-webkit-slider-thumb{
+                  transform:scale(1.15);
+                  border-color:#e040ff;
+                  box-shadow:0 0 20px rgba(224,64,255,0.9);
+                }
+                .vt-slider::-moz-range-thumb{
+                  width:14px;height:14px;border-radius:50%;
+                  background:#0f1822;border:1.5px solid #00e5ff;
+                  box-shadow:0 0 8px rgba(0,229,255,0.6);
+                  cursor:pointer;
+                }
+                /* === 分组折叠 === */
+                .vt-section{margin-bottom:6px;}
+                .vt-section-label{
+                  font-size:9px;color:#5a7a92;text-transform:uppercase;letter-spacing:1.5px;
+                  margin-bottom:6px;font-weight:600;
+                  display:flex;align-items:center;gap:6px;cursor:pointer;
+                  padding:3px 0;user-select:none;
+                }
+                .vt-section-label::before{
+                  content:'▾';color:#40e0ff;font-size:10px;transition:transform .2s;
+                }
+                .vt-section.collapsed .vt-section-label::before{transform:rotate(-90deg);}
+                .vt-section.collapsed .vt-section-content{display:none;}
+                .vt-section-content{transition:max-height .2s;}
+                .vt-divider{
+                  height:1px;margin:8px 0;
+                  background:linear-gradient(90deg,transparent,rgba(64,224,255,0.2),transparent);
+                }
+                /* === 帮助文字 === */
+                .vt-help{
+                  margin-top:8px;padding:6px 8px;
+                  background:rgba(0,229,255,0.04);border-radius:4px;
+                  border-left:2px solid rgba(0,229,255,0.3);
+                  font-size:10px;color:#7a92a8;line-height:1.6;
+                }
+                .vt-help b{color:#a8c4d8;font-weight:600;}
+                /* === 情感卡片 === */
+                .vt-emotion-card{
+                  padding:10px 12px;margin-bottom:8px;
+                  background:linear-gradient(135deg,rgba(26,35,50,0.95),rgba(15,24,34,0.95));
+                  border-radius:8px;border:1px solid rgba(64,224,255,0.12);
+                  box-shadow:inset 0 1px 0 rgba(64,224,255,0.04);
+                }
+                .vt-emotion-card .vt-row{margin-bottom:6px;height:22px;}
+                .vt-emotion-card .vt-label{flex:0 0 52px;font-size:10px;}
+                .vt-emotion-card .vt-val{flex:0 0 44px;font-size:10px;}
+                .vt-emotion-title{
+                  display:flex;justify-content:space-between;align-items:center;
+                  margin-bottom:6px;padding-bottom:4px;
+                  border-bottom:1px solid rgba(64,224,255,0.1);
+                }
+                .vt-emotion-title .name{font-size:12px;font-weight:600;color:#c8d8e8;}
+                .vt-emotion-title .note{font-size:9px;color:#5a7a92;font-style:italic;}
+                .vt-select{
+                  flex:1;padding:3px 6px;font-size:10px;
+                  background:#0a1218;color:#c8d8e8;
+                  border:1px solid rgba(64,224,255,0.2);border-radius:3px;
+                  outline:none;cursor:pointer;
+                }
+                .vt-select:focus{border-color:#00e5ff;box-shadow:0 0 6px rgba(0,229,255,0.3);}
+              </style>
+              <div class="vt-card">
+                <div class="vt-card-title">VOICE CONTROL</div>
+                <!-- 基础音色（常调，默认展开）-->
+                <div class="vt-section" data-section="basic">
+                  <div class="vt-section-label" onclick="this.parentElement.classList.toggle('collapsed')">基础音色</div>
+                  <div class="vt-section-content">
+                    <div class="vt-row">
+                      <span class="vt-label">语速</span>
+                      <input type="range" class="vt-slider" id="vt-global-speed" min="-0.06" max="0.06" step="0.01" value="0">
+                      <span class="vt-val" id="vt-global-speed-val">0</span>
+                    </div>
+                    <div class="vt-row">
+                      <span class="vt-label">音调</span>
+                      <input type="range" class="vt-slider" id="vt-global-pitch" min="-1" max="1" step="0.1" value="0">
+                      <span class="vt-val" id="vt-global-pitch-val">0</span>
+                    </div>
+                    <div class="vt-row">
+                      <span class="vt-label">温度</span>
+                      <input type="range" class="vt-slider" id="vt-global-temp" min="-0.03" max="0.03" step="0.01" value="0">
+                      <span class="vt-val" id="vt-global-temp-val">0</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="vt-divider"></div>
+                <!-- 温柔质感（常调）-->
+                <div class="vt-section" data-section="soft">
+                  <div class="vt-section-label" onclick="this.parentElement.classList.toggle('collapsed')">温柔质感</div>
+                  <div class="vt-section-content">
+                    <div class="vt-row">
+                      <span class="vt-label">柔和度</span>
+                      <input type="range" class="vt-slider" id="vt-global-soft" min="-0.25" max="0.35" step="0.05" value="0">
+                      <span class="vt-val" id="vt-global-soft-val">0</span>
+                    </div>
+                    <div class="vt-row">
+                      <span class="vt-label">句间停顿</span>
+                      <input type="range" class="vt-slider" id="vt-global-pause" min="0" max="2.0" step="0.05" value="0">
+                      <span class="vt-val" id="vt-global-pause-val">0</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="vt-divider"></div>
+                <!-- 输出控制（收起）-->
+                <div class="vt-section collapsed" data-section="output">
+                  <div class="vt-section-label" onclick="this.parentElement.classList.toggle('collapsed')">输出控制</div>
+                  <div class="vt-section-content">
+                    <div class="vt-row">
+                      <span class="vt-label">整体音量</span>
+                      <input type="range" class="vt-slider" id="vt-global-volume" min="-0.25" max="0.25" step="0.05" value="0">
+                      <span class="vt-val" id="vt-global-volume-val">0</span>
+                    </div>
+                    <div class="vt-row">
+                      <span class="vt-label">开头淡入</span>
+                      <input type="range" class="vt-slider" id="vt-global-fadein" min="0" max="0.5" step="0.005" value="0.015">
+                      <span class="vt-val" id="vt-global-fadein-val">0.015</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="vt-help">
+                  <b>声纹身份已锁定</b>：所有情绪使用同一参考音和采样条件。<br>
+                  <b>语速</b>:±0.06 ｜<b>音调</b>:±1半音 ｜<b>温度</b>:仅允许微调<br>
+                  <b>柔和度</b>:轻量力度与尾音，不再改变频谱 ｜<b>停顿</b>:放大句间静音<br>
+                  <b>音量</b>:±0.25 ｜<b>淡入</b>:开头渐入时长（秒）
+                </div>
+              </div>
+              <!-- 试听 -->
+              <div style="margin-top:10px;display:flex;gap:8px;align-items:center;">
+                <input type="text" id="vt-test-text" placeholder="输入试听文本" style="flex:1;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px;" value="指挥，您知道现在几点吗？">
+                <select id="vt-test-emotion" style="padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+                  <option value="auto">自动</option>
+                </select>
+                <button id="btn-vt-test" class="settings-action-btn" style="padding:6px 12px;font-size:12px;white-space:nowrap;">试听</button>
+              </div>
+              <div id="vt-test-result" style="margin-top:6px;font-size:12px;color:#666;min-height:20px;"></div>
+              <!-- ★ 试听历史：最多2个（上一轮+上上轮），超出删除 -->
+              <div id="vt-preview-history" style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;"></div>
+              <!-- 保存/重置 -->
+              <div style="margin-top:10px;display:flex;gap:8px;">
+                <button id="btn-save-voice-tuning" class="settings-save-btn" style="flex:1;">保存语音配置</button>
+                <button id="btn-reset-voice-tuning" class="settings-action-btn" style="padding:8px 12px;font-size:12px;color:#ff4d4f;">重置默认</button>
+              </div>
+              <span id="vt-save-hint" style="font-size:11px;color:#07c160;margin-left:8px;"></span>
+            </div>
+          </div>
+
+          <div class="settings-section" id="daily-performance-candidate-section">
+              <div class="section-title">新添加 调试用—语音动作</div>
+              <div style="font-size:11px;color:#777;line-height:1.6;margin-bottom:8px;">动作与表情分开候选；仅预览不会写入正式池，只有你点击确认后才会接受。</div>
+              <div id="release-motion-candidate-review" class="release-candidate-list"></div>
+              <div class="section-title" style="margin-top:14px;">新添加 调试用—表情</div>
+              <div id="release-expression-candidate-review" class="release-candidate-list"></div>
+          </div>
+
+          <div class="settings-section" id="voice-train-link-section">
+            <div class="section-title">语音克隆训练</div>
+            <div class="setting-item">
+              <label>从音频文件克隆角色语音</label>
+              <button id="btn-open-voice-train" class="settings-action-btn" style="padding:10px 16px;">打开训练工具</button>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="section-title">界面设置</div>
+            <div class="setting-item">
+              <label>聊天主题</label>
+              <select id="set-theme">
+                <option value="aurora">极光紫蓝</option>
+                <option value="sakura">樱花粉</option>
+                <option value="ocean">海洋蓝</option>
+                <option value="nebula">星云紫粉</option>
+                <option value="sunset">日落橙粉</option>
+                <option value="midnight">午夜深蓝</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>自定义背景图 <span style="font-size:11px;color:#999;">（支持JPG/PNG/GIF动图，留空使用主题默认）</span></label>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <input type="text" id="set-custom-bg" placeholder="输入图片URL或上传文件" style="flex:1;">
+                <button id="btn-upload-bg" class="settings-action-btn" style="padding:6px 12px;font-size:12px;white-space:nowrap;">上传</button>
+                <button id="btn-clear-bg" class="settings-action-btn" style="padding:6px 12px;font-size:12px;color:#ff4d4f;">清除</button>
+                <input type="file" id="file-custom-bg" accept="image/*" style="display:none;">
+              </div>
+            </div>
+            <div class="setting-item">
+              <label>背景显示模式</label>
+              <select id="set-bg-mode">
+                <option value="cover" selected>铺满（自适应裁剪）</option>
+                <option value="contain">适应（完整显示）</option>
+                <option value="center">居中（原始大小）</option>
+                <option value="repeat">平铺</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>背景透明度 <span id="val-opacity">100%</span></label>
+              <input type="range" id="set-opacity" min="0" max="100" value="100">
+            </div>
+            <div class="setting-item">
+              <label>亮度 <span id="val-brightness">100%</span></label>
+              <input type="range" id="set-brightness" min="30" max="150" value="100">
+            </div>
+            <div class="setting-item">
+              <label>字体大小 <span id="val-fontsize">15px</span></label>
+              <input type="range" id="set-fontsize" min="12" max="22" value="15">
+            </div>
+            <div class="setting-item">
+              <label>字体</label>
+              <select id="set-fontfamily">
+                <option value="system">系统默认</option>
+                <option value="serif">宋体 / 衬线</option>
+                <option value="mono">等宽字体</option>
+                <option value="rounded">圆体</option>
+                <option value="cute">可爱手写</option>
+                <option value="kawaii">萌系圆体</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>聊天气泡圆角 <span id="val-radius">10px</span></label>
+              <input type="range" id="set-radius" min="0" max="20" value="10">
+            </div>
+            <div class="setting-item">
+              <label>流光呼吸频率</label>
+              <select id="set-breath-speed">
+                <option value="slow" selected>慢（默认）</option>
+                <option value="normal">中（活跃）</option>
+                <option value="fast">快（明快）</option>
+                <option value="off">关闭</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>触屏扰动强度</label>
+              <select id="set-touch-intensity">
+                <option value="off">关闭</option>
+                <option value="light" selected>轻微（默认）</option>
+                <option value="normal">中等</option>
+                <option value="strong">明显</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>涟漪生成频率</label>
+              <select id="set-ripple-freq">
+                <option value="sparse" selected>稀疏（默认）</option>
+                <option value="normal">正常</option>
+                <option value="dense">密集（活跃）</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>触屏效果样式</label>
+              <select id="set-ripple-style">
+                <option value="ripple">水面涟漪</option>
+                <option value="petal">花瓣飘落</option>
+                <option value="sparkle">光点粒子</option>
+                <option value="note" selected>音符飘升（默认）</option>
+                <option value="off">关闭</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="section-title">数据管理<span style="font-size:11px;color:#888;font-weight:normal;margin-left:8px;">（以下操作仅影响当前角色）</span></div>
+            <div class="setting-item row">
+              <button id="btn-clear-history" class="settings-action-btn danger">清空聊天记录</button>
+            </div>
+            <div class="setting-item row">
+              <button id="btn-rebuild-index" class="settings-action-btn">重建历史索引</button>
+            </div>
+            <div class="setting-item row">
+              <button id="btn-clear-image-cache" class="settings-action-btn">清空图片缓存</button>
+            </div>
+            <div class="setting-item row">
+              <button id="btn-clear-voice-cache" class="settings-action-btn">清空历史语音文件</button>
+            </div>
+            <div class="setting-item row" style="margin-top:10px;">
+              <label style="font-size:13px;min-width:120px;">语音缓存上限</label>
+              <select id="set-voice-cache-limit" style="background:rgba(20,30,50,0.6);color:#c8d6e5;border:1px solid rgba(0,229,255,0.2);border-radius:6px;padding:4px 8px;font-size:12px;flex:1;">
+                <option value="30">满30条删除（默认）</option>
+                <option value="60">满60条删除</option>
+                <option value="100">满100条删除</option>
+                <option value="0">关闭自动删除</option>
+              </select>
+              <button id="btn-save-voice-cache-limit" class="settings-action-btn" style="padding:4px 12px;font-size:12px;margin-left:8px;">保存</button>
+            </div>
+            <div style="font-size:11px;color:#888;line-height:1.5;margin-top:4px;">「语音缓存上限」控制用户数据中<span style="color:#4dd9ff;">当前角色</span>的新版聊天 wav 文件最大数量。达到上限时自动删除该角色最旧的半数文件（30删15/60删30/100删50）；保存设置或启动时会立即检查。每个角色独立计数互不影响。</div>
+            <div style="font-size:11px;color:#888;line-height:1.5;margin-top:6px;">「清空历史语音文件」仅删除<span style="color:#4dd9ff;">当前角色</span>过往 AI 回复生成的临时 wav 文件（释放磁盘空间），不影响其他角色，不影响语音克隆训练数据，也不影响后续语音合成。语音是实时合成的，不是实时训练的——训练只在克隆声音时进行一次。</div>
+            <div style="font-size:11px;color:#888;line-height:1.5;margin-top:4px;">「清空图片缓存」仅删除<span style="color:#4dd9ff;">当前角色</span>在聊天中上传的图片文件（uploads/ 下 char&lt;角色ID&gt;_img_* 前缀），不影响其他角色的聊天图片。</div>
+            <div style="font-size:11px;color:#888;line-height:1.5;margin-top:4px;">「重建历史索引」从归档重建<span style="color:#4dd9ff;">当前角色</span>的 RAG 检索索引，用于清理删除对话后残留的污染数据（如过时问候、错误内容），保证 AI 检索到的历史与当前对话一致。</div>
+          </div>
+
+          <div class="settings-section">
+            <div class="section-title">自定义图片</div>
+            <div class="setting-item">
+              <label>角色头像</label>
+              <div class="image-upload-row">
+                <img id="preview-character" class="image-preview" src="" alt="角色头像">
+                <button class="settings-action-btn image-btn" onclick="document.getElementById('file-character').click()">更换</button>
+                <input type="file" id="file-character" accept="image/*" style="display:none">
+              </div>
+            </div>
+            <div class="setting-item">
+              <label>用户头像</label>
+              <div class="image-upload-row">
+                <img id="preview-user" class="image-preview" src="" alt="用户头像">
+                <button class="settings-action-btn image-btn" onclick="document.getElementById('file-user').click()">更换</button>
+                <input type="file" id="file-user" accept="image/*" style="display:none">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="page-characters" class="page">
+      <div class="settings-container">
+        <div class="settings-header">
+          <button id="btn-chars-back" class="header-btn icon-btn ripple-container" title="返回聊天">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <span class="settings-title">角色管理</span>
+          <button id="btn-add-character" class="header-btn icon-btn ripple-container" title="新建角色">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+        <div class="settings-scroll">
+          <div class="char-page-intro">
+            <div class="char-intro-title">我的角色</div>
+            <div class="char-intro-sub">点击卡片切换对话角色，长按或删除按钮可移除</div>
+          </div>
+          <div id="characters-list" class="char-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="confirm-modal" class="modal" style="display:none;">
+      <div class="modal-content small">
+        <div class="modal-body center">
+          <p id="confirm-text"></p>
+        </div>
+        <div class="modal-footer center">
+          <button id="btn-confirm-yes" class="modal-btn danger">确认</button>
+          <button id="btn-confirm-no" class="modal-btn">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 通用信息提示弹窗（符合页面UI） -->
+    <div id="info-modal" class="modal" style="display:none;">
+      <div class="modal-content small">
+        <div class="modal-body center">
+          <p id="info-text"></p>
+        </div>
+        <div class="modal-footer center">
+          <button id="btn-info-ok" class="modal-btn">知道了</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 语音控制面板（点击小喇叭弹出）：GPU/CPU 切换 + 启停 -->
+    <div id="voice-control-popover" class="voice-popover" style="display:none;">
+      <div class="voice-popover-header">
+        <span class="voice-popover-title">语音服务</span>
+        <span id="voice-popover-status" class="voice-popover-tag">检测中</span>
+      </div>
+      <div class="voice-popover-row">
+        <label class="voice-popover-label">合成设备</label>
+        <div class="voice-popover-device">
+          <button id="voice-device-gpu" class="voice-device-btn active" data-device="gpu">GPU</button>
+          <button id="voice-device-cpu" class="voice-device-btn" data-device="cpu">CPU</button>
+        </div>
+      </div>
+      <div class="voice-popover-tip" id="voice-popover-tip">GPU 合成快（约2-5秒），CPU 更稳定但慢（约30秒+）</div>
+      <div class="voice-popover-actions">
+        <button id="voice-action-start" class="voice-action-btn primary">启动</button>
+        <button id="voice-action-stop" class="voice-action-btn">停止</button>
+      </div>
+    </div>
+
+    <!-- 语音切换弹窗：为当前角色选择已克隆的语音 -->
+    <div id="voice-switch-modal" class="modal" style="display:none;">
+      <div class="modal-content voice-switch-modal-content">
+        <div class="modal-header">
+          <h3>切换语音</h3>
+          <button id="btn-close-voice-switch" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+          <div id="voice-switch-char-info" class="voice-switch-info"></div>
+          <div id="voice-switch-list" class="voice-switch-list"></div>
+          <div id="voice-switch-empty" class="voice-switch-empty">
+            暂无可用语音，请先进行<a href="/voice-train" target="_blank" class="voice-switch-link">语音克隆训练</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 语音重命名弹窗 -->
+    <div id="voice-rename-modal" class="modal" style="display:none;">
+      <div class="modal-content voice-rename-modal-content">
+        <div class="modal-header">
+          <h3>重命名语音</h3>
+          <button id="btn-close-voice-rename" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="voice-rename-hint">为语音输入新名称（中文、英文、数字均可）</div>
+          <input type="text" id="voice-rename-input" class="voice-rename-input" placeholder="例如：温柔少女、少年音">
+          <div id="voice-rename-status" class="voice-rename-status"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-voice-rename-cancel" class="modal-btn">取消</button>
+          <button id="btn-voice-rename-confirm" class="modal-btn primary">确认重命名</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 语音删除二次确认弹窗 -->
+    <div id="voice-delete-modal" class="modal" style="display:none;">
+      <div class="modal-content voice-delete-modal-content">
+        <div class="modal-header">
+          <h3>删除语音</h3>
+          <button id="btn-close-voice-delete" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="voice-delete-warning">
+            <div class="voice-delete-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            </div>
+            <div class="voice-delete-title">确定要删除语音「<span id="voice-delete-name"></span>」吗？</div>
+            <div class="voice-delete-hint">语音文件将移入系统回收站，可在回收站中还原。正在使用该语音的角色会自动切换到其他语音。</div>
+          </div>
+          <div id="voice-delete-status" class="voice-delete-status"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-voice-delete-cancel" class="modal-btn">取消</button>
+          <button id="btn-voice-delete-confirm" class="modal-btn voice-delete-confirm-btn">删除</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="create-character-modal" class="modal" style="display:none;">
+      <div class="modal-content" style="max-width:560px;">
+        <div class="modal-header">
+          <h3 id="create-modal-title">创建新角色</h3>
+          <button id="btn-close-create-char" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+          <!-- 步骤1：选择创建方式 -->
+          <div id="create-step-1">
+            <div style="font-size:13px;color:#666;margin-bottom:12px;">请选择角色创建方式：</div>
+            <div id="create-method-web" class="create-method-card">
+              <div style="font-size:15px;font-weight:bold;color:#4a90d9;">1. 基于网络内容</div>
+              <div style="font-size:12px;color:#999;margin-top:4px;">通过网络搜索游戏/动漫/现实人物资料，自动蒸馏生成聊天Skill。适合公开人物。</div>
+            </div>
+            <div id="create-method-custom" class="create-method-card">
+              <div style="font-size:15px;font-weight:bold;color:#27ae60;">2. 基于自定义内容</div>
+              <div style="font-size:12px;color:#999;margin-top:4px;">通过导入人物性格、聊天记录、朋友圈、图片等素材，还原人物聊天习惯。</div>
+            </div>
+          </div>
+
+          <!-- 步骤2A：网络蒸馏配置（含基础信息） -->
+          <div id="create-step-web" style="display:none;">
+            <div class="subsection-title">基础信息</div>
+            <div class="setting-item">
+              <label>角色ID <span style="font-size:11px;color:#999;">（英文/数字，创建后不可修改）</span></label>
+              <input type="text" id="web-char-id" placeholder="例如: libai">
+            </div>
+            <div class="setting-item">
+              <label>人物名称 <span style="font-size:11px;color:#999;">（留空使用当前角色名）</span></label>
+              <input type="text" id="web-char-name" placeholder="人物姓名">
+            </div>
+            <div class="setting-item">
+              <label>人物类型</label>
+              <select id="web-char-type">
+                <option value="auto">自动检测</option>
+                <option value="game">游戏角色</option>
+                <option value="anime">动漫角色</option>
+                <option value="real">现实人物</option>
+              </select>
+            </div>
+            <div class="setting-item" style="flex-direction:column;align-items:stretch;gap:6px;">
+              <label>角色对用户认知 <span style="font-size:11px;color:#999;">（必填，第一优先人物设定）</span></label>
+              <textarea id="web-char-user-cognition" class="char-textarea" rows="3" placeholder="角色眼中用户是谁？默认是游戏/动漫主角；若创建的角色本身就是主角，可写希望扮演的剧中身份（如：操作者、玩家、监督员）。"></textarea>
+              <div style="font-size:11px;color:#888;line-height:1.5;">与"用户称呼"同级，作为最高优先级人物设定注入对话。</div>
+            </div>
+            <div class="setting-item">
+              <label>搜索提示词 <span style="font-size:11px;color:#999;">（可选，影响所有默认搜索源）</span></label>
+              <input type="text" id="web-char-hints" placeholder="如：李白 唐 诗人 或 朱元璋 明 NOT 电视剧">
+              <div style="font-size:11px;color:#999;margin-top:2px;line-height:1.5;">
+                空格=AND；OR=任一；NOT=排除。如：<code>朱元璋 明 NOT 电视剧</code>
+              </div>
+            </div>
+            <div class="setting-item">
+              <label>补充设定 <span style="font-size:11px;color:#999;">（可选，手动填写角色背景、性格等）</span></label>
+              <textarea id="web-char-supplementary" class="char-textarea" rows="3" placeholder="可手动补充角色设定，蒸馏后会与网络资料合并"></textarea>
+            </div>
+
+            <div class="subsection-title" style="margin-top:12px;">资料网址</div>
+            <div style="font-size:12px;color:rgba(216,210,235,0.65);margin-bottom:8px;padding:8px 10px;background:transparent;border-radius:6px;line-height:1.6;">
+              蒸馏时自动搜索：萌娘百科 / Wikipedia / BWIKI / DuckDuckGo / 百度百科 / 知乎（无需手动添加）
+            </div>
+            <div id="create-web-urls-list" style="margin-bottom:8px;"></div>
+            <div style="font-size:11px;color:#888;margin-bottom:4px;">添加额外资料网址：</div>
+            <div style="display:flex;gap:6px;margin-bottom:6px;">
+              <select id="create-web-url-type" style="flex:0 0 90px;">
+                <option value="web">网页</option>
+                <option value="search">搜索页</option>
+                <option value="api">API</option>
+              </select>
+              <input type="text" id="create-web-url-title" placeholder="标签名（可选）" style="flex:0 0 80px;">
+              <input type="text" id="create-web-url-value" placeholder="填URL地址" style="flex:1;">
+              <button id="btn-create-web-add-url" class="modal-btn" style="flex:0 0 auto;" disabled>添加</button>
+            </div>
+            <div style="font-size:11px;color:#999;margin-bottom:8px;padding:4px 8px;background:rgba(0,0,0,0.03);border-radius:4px;line-height:1.5;">
+              <strong>网页</strong>：填URL，如 https://wiki.kurobbs.com/pns/露西亚<br>
+              <strong>搜索页</strong>：填搜索主页URL，自动拼接角色名。如 https://www.douyin.com/search/<br>
+              <strong>API</strong>：填返回JSON的接口URL
+            </div>
+            <div style="font-size:12px;color:#999;margin:4px 0;">创建后将自动搜索全部来源进行蒸馏，生成角色Skill并补充背景/性格/说话风格/喜好/故事。</div>
+          </div>
+
+          <!-- 步骤2B：自定义蒸馏配置（含基础信息+素材上传） -->
+          <div id="create-step-custom" style="display:none;">
+            <div class="subsection-title">基础信息</div>
+            <div class="setting-item">
+              <label>角色ID <span style="font-size:11px;color:#999;">（英文/数字，创建后不可修改）</span></label>
+              <input type="text" id="custom-char-id" placeholder="例如: grandpa">
+            </div>
+            <div class="setting-item">
+              <label>人物名称 <span style="font-size:11px;color:#999;">（留空使用当前角色名）</span></label>
+              <input type="text" id="custom-char-name" placeholder="人物姓名">
+            </div>
+            <div class="setting-item">
+              <label>人物称谓 <span style="font-size:11px;color:#999;">（你如何称呼此人）</span></label>
+              <input type="text" id="custom-char-relationship" placeholder="如：老爸 / 闺蜜 / 张老师">
+            </div>
+            <div class="setting-item" style="flex-direction:column;align-items:stretch;gap:6px;">
+              <label>角色对用户认知 <span style="font-size:11px;color:#999;">（必填，第一优先人物设定）</span></label>
+              <textarea id="custom-char-user-cognition" class="char-textarea" rows="3" placeholder="角色眼中用户是谁？如：操作者、玩家、监督员；或某个具体身份。"></textarea>
+              <div style="font-size:11px;color:#888;line-height:1.5;">与"用户称呼"同级，作为最高优先级人物设定注入对话。</div>
+            </div>
+            <div class="setting-item">
+              <label>人物语气倾向</label>
+              <select id="custom-char-purpose">
+                <option value="warm">温柔（温暖关怀的语气）</option>
+                <option value="conflict">矛盾（有张力、更真实）</option>
+                <option value="neutral">自然（如实还原，不加修饰）</option>
+              </select>
+            </div>
+
+            <div class="subsection-title" style="margin-top:12px;">素材上传 <span style="font-size:11px;color:#999;">（可选，支持txt/图片/语音）</span></div>
+            <div class="setting-item">
+              <label>上传TXT文件 <span style="font-size:11px;color:#999;">（聊天记录、日记、信件等文本）</span></label>
+              <input type="file" id="custom-upload-txt" accept=".txt,.md" multiple>
+            </div>
+            <div class="setting-item">
+              <label>上传图片 <span style="font-size:11px;color:#999;">（聊天截图、手写信、朋友圈截图等，最多10张）</span></label>
+              <input type="file" id="custom-upload-images" accept="image/*" multiple>
+            </div>
+            <div class="setting-item">
+              <label>上传语音 <span style="font-size:11px;color:#999;">（此人的语音消息，最多10条，支持mp3/wav/m4a等）</span></label>
+              <input type="file" id="custom-upload-audios" accept="audio/*" multiple>
+            </div>
+
+            <div class="subsection-title" style="margin-top:12px;">手动补充</div>
+            <div class="setting-item">
+              <label>性格描述</label>
+              <textarea id="custom-char-personality" class="char-textarea" rows="3" placeholder="此人的性格特点、为人处世方式"></textarea>
+            </div>
+            <div class="setting-item">
+              <label>聊天记录</label>
+              <textarea id="custom-char-chat" class="char-textarea" rows="4" placeholder="粘贴聊天记录"></textarea>
+            </div>
+            <div class="setting-item">
+              <label>朋友圈/动态</label>
+              <textarea id="custom-char-moments" class="char-textarea" rows="2" placeholder="此人发过的动态内容"></textarea>
+            </div>
+            <div class="setting-item">
+              <label>其他备注</label>
+              <textarea id="custom-char-notes" class="char-textarea" rows="2" placeholder="口头禅、喜好、习惯等"></textarea>
+            </div>
+            <div style="font-size:12px;color:#e67e22;margin:8px 0;padding:6px 8px;background:rgba(230,126,34,0.08);border-radius:6px;">蒸馏后，图片会简单描述（文字聊天图提取文字），所有素材整理为历史记录md，用户提到关键词时可搜索到。</div>
+          </div>
+
+          <!-- 步骤3：自定义蒸馏进度（仅自定义方式） -->
+          <div id="create-step-progress" style="display:none;">
+            <div style="text-align:center;padding:30px 10px;">
+              <div id="create-progress-status" style="font-size:14px;color:#666;margin-bottom:16px;">正在蒸馏中...</div>
+              <div id="create-progress-detail" style="font-size:12px;color:#999;"></div>
+            </div>
+          </div>
+
+          <!-- 步骤4：自定义图片上传（仅自定义方式，蒸馏完成后） -->
+          <div id="create-step-images" style="display:none;">
+            <div class="subsection-title">自定义角色图片 <span style="font-size:11px;color:#999;">（可选）</span></div>
+            <div style="font-size:12px;color:#999;margin-bottom:8px;">上传角色头像（可选，可跳过）</div>
+            <div class="setting-item">
+              <label>角色头像</label>
+              <input type="file" id="final-char-avatar" accept="image/*">
+            </div>
+            <div style="font-size:12px;color:#999;margin:8px 0;">跳过将使用默认图片。点击"完成"结束创建。</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-cancel-create-char" class="modal-btn">取消</button>
+          <button id="btn-back-create-char" class="modal-btn" style="display:none;">上一步</button>
+          <button id="btn-next-create-char" class="modal-btn" style="display:none;">下一步</button>
+          <button id="btn-confirm-create-char" class="modal-btn" style="background:#07c160;color:#fff;border-color:#07c160;display:none;">创建并蒸馏</button>
+          <button id="btn-finish-create-char" class="modal-btn" style="background:#07c160;color:#fff;border-color:#07c160;display:none;">完成</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="msg-context-menu" class="msg-context-menu" style="display:none;">
+      <button id="btn-delete-msg" class="context-menu-item">删除</button>
+    </div>
+  </div>
+
+  <!-- 聊天字体颜色选择浮层 -->
+  <div id="text-color-popover" class="text-color-popover" style="display:none;">
+    <div class="text-color-title">聊天字体颜色</div>
+    <div class="text-color-grid">
+      <div class="text-color-swatch" data-color="rgba(255,255,255,0.92)" data-name="经典白" style="background:rgba(255,255,255,0.92);"></div>
+      <div class="text-color-swatch" data-color="#fff5e6" data-name="暖白" style="background:#fff5e6;"></div>
+      <div class="text-color-swatch" data-color="#b8d4ff" data-name="浅蓝" style="background:#b8d4ff;"></div>
+      <div class="text-color-swatch" data-color="#ffc8d8" data-name="浅粉" style="background:#ffc8d8;"></div>
+      <div class="text-color-swatch" data-color="#c8f0c8" data-name="浅绿" style="background:#c8f0c8;"></div>
+      <div class="text-color-swatch" data-color="#d8c8ff" data-name="浅紫" style="background:#d8c8ff;"></div>
+      <div class="text-color-swatch" data-color="#fff0a8" data-name="浅黄" style="background:#fff0a8;"></div>
+      <div class="text-color-swatch" data-color="#ffd8a8" data-name="浅橙" style="background:#ffd8a8;"></div>
+      <div class="text-color-swatch" data-color="#1a1a1a" data-name="墨黑" style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.2);"></div>
+      <div class="text-color-swatch" data-color="#4a4a4a" data-name="深灰" style="background:#4a4a4a;border:1px solid rgba(255,255,255,0.2);"></div>
+    </div>
+    <div class="text-color-footer">
+      <span id="text-color-current-name" class="text-color-current-name">经典白</span>
+      <button id="btn-text-color-reset" class="text-color-reset-btn">重置默认</button>
+    </div>
+  </div>
+
+  <script src="gapless-player.js"></script>
+  <script src="voice-autoplay-policy.js"></script>
+  <script src="voice-segment-queue.js"></script>
+  <script src="app.js"></script>
+  <!-- ChatX2 扩展：仅在 Electron 环境下生效（window.chatx2 由 chat-preload 注入） -->
+  <!-- 功能：桌宠模式切换（含关闭）、3D 模型管理（切换/动作/VMD 导入/PMX 选择） -->
+  <!-- 桌宠与聊天界面共存：切换到桌宠不隐藏聊天页，可单独或同时显示 -->
+  <script>
+  (function () {
+    'use strict';
+    var chatx2 = window.chatx2;
+    if (!chatx2 || typeof chatx2.transition !== 'function') {
+      console.log('[chatx2-ext] Not in Electron environment, chatx2 features disabled');
+      return;
+    }
+    console.log('[chatx2-ext] Electron environment detected, enabling chatx2 features');
+
+    function ready(fn) {
+      if (document.readyState !== 'loading') { fn(); }
+      else { document.addEventListener('DOMContentLoaded', fn); }
+    }
+
+    ready(function () {
+      var headerRight = document.querySelector('.header-right');
+      if (!headerRight) {
+        console.warn('[chatx2-ext] .header-right not found');
+        return;
+      }
+
+      // 桌宠模式按钮（点击切换到桌宠；再次点击切回纯聊天）
+      var btnDesktop = document.createElement('button');
+      btnDesktop.id = 'btn-chatx2-desktop';
+      btnDesktop.className = 'header-btn icon-btn ripple-container';
+      btnDesktop.title = '切换到桌宠模式（3D模型 + 迷你输入框）';
+      btnDesktop.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="8" r="2"/><path d="M8 14h8"/><path d="M10 18h4"/></svg>';
+      var desktopActive = false;
+      btnDesktop.addEventListener('click', async function () {
+        try {
+          btnDesktop.disabled = true;
+          if (desktopActive) {
+            // 关闭桌宠模式：调用 exit-desktop 确保窗口隐藏 + 模式切换
+            var exitResult = await chatx2.exitDesktop();
+            if (exitResult && exitResult.success) {
+              desktopActive = false;
+              btnDesktop.style.color = '';
+              btnDesktop.title = '切换到桌宠模式（3D模型 + 迷你输入框）';
+            } else {
+              // 降级：直接 transition
+              var result = await chatx2.transition('chat');
+              if (result.status === 'ok') {
+                desktopActive = false;
+                btnDesktop.style.color = '';
+                btnDesktop.title = '切换到桌宠模式（3D模型 + 迷你输入框）';
+              }
+            }
+          } else {
+            // 打开桌宠模式
+            var result = await chatx2.transition('desktop');
+            if (result.status === 'ok') {
+              desktopActive = true;
+              btnDesktop.style.color = '#07c160';
+              btnDesktop.title = '关闭桌宠模式（回到纯聊天）';
+            } else {
+              alert('切换失败: ' + (result.reason || '未知原因'));
+            }
+          }
+        } catch (e) {
+          alert('切换失败: ' + (e.message || e));
+        } finally {
+          btnDesktop.disabled = false;
+        }
+      });
+      headerRight.insertBefore(btnDesktop, headerRight.firstChild);
+
+      // 监听 mode-change 事件，同步 desktopActive 状态
+      // 当桌宠窗口被右键退出或其他原因切回 chat 时，按钮状态需要同步更新
+      if (chatx2.onModeChange) {
+        chatx2.onModeChange(function (event) {
+          if (event.to === 'desktop') {
+            desktopActive = true;
+            btnDesktop.style.color = '#07c160';
+            btnDesktop.title = '关闭桌宠模式（回到纯聊天）';
+          } else if (event.to === 'chat') {
+            desktopActive = false;
+            btnDesktop.style.color = '';
+            btnDesktop.title = '切换到桌宠模式（3D模型 + 迷你输入框）';
+          }
+        });
+      }
+
+      // 3D 模型管理按钮
+      var btnModel = document.createElement('button');
+      btnModel.id = 'btn-chatx2-model';
+      btnModel.className = 'header-btn icon-btn ripple-container';
+      btnModel.title = '3D 模型管理（切换模型/动作/VMD导入）';
+      btnModel.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
+      btnModel.addEventListener('click', function () { toggleModelPanel(); });
+      headerRight.insertBefore(btnModel, headerRight.firstChild);
+
+      console.log('[chatx2-ext] Header buttons added (desktop toggle + 3D model manager)');
+    });
+
+    // --- 3D 模型管理面板 ---
+    var panel = null;
+
+    function toggleModelPanel() {
+      if (panel) {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        return;
+      }
+      panel = document.createElement('div');
+      panel.id = 'chatx2-model-panel';
+      panel.style.cssText = 'position:fixed;top:60px;right:20px;width:460px;max-height:92vh;overflow-y:auto;background:#1a1d23;border:1px solid #2a2d33;border-radius:8px;padding:16px;z-index:10000;box-shadow:0 4px 20px rgba(0,0,0,0.5);color:#e0e0e0;font-size:13px;font-family:sans-serif;';
+      panel.innerHTML = ''
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'
+        +   '<h2 style="margin:0;font-size:15px;color:#e0e0e0;">3D 模型管理</h2>'
+        +   '<button id="chatx2-close" style="background:none;border:none;color:#9a9da3;font-size:20px;cursor:pointer;padding:0 4px;">×</button>'
+        + '</div>'
+        + '<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #2a2d33;">'
+        +   '<div style="font-size:12px;color:#9a9da3;margin-bottom:6px;">当前模型</div>'
+        +   '<select id="chatx2-select" style="width:100%;padding:6px 8px;background:#0f1115;color:#e0e0e0;border:1px solid #2a2d33;border-radius:4px;font-size:13px;box-sizing:border-box;"></select>'
+        +   '<div id="chatx2-info" style="font-size:11px;color:#9a9da3;margin-top:4px;line-height:1.5;"></div>'
+        + '</div>'
+
+         + '<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #2a2d33;">'
+         +   '<div style="font-size:12px;color:#9a9da3;margin-bottom:6px;">动作库 <span id="chatx2-vmd-count" style="color:#a0c0d0;"></span></div>'
+         +   '<input id="chatx2-vmd-search" type="text" placeholder="搜索动作名称..." style="width:100%;padding:6px 8px;background:#0f1115;color:#e0e0e0;border:1px solid #2a2d33;border-radius:4px;font-size:12px;box-sizing:border-box;margin-bottom:8px;">'
+         +   '<div id="chatx2-vmd" style="font-size:12px;color:#c0c0c0;"></div>'
+         +   '<div style="display:flex;gap:6px;margin-top:6px;">'
+         +     '<button id="chatx2-import" style="padding:6px 12px;background:#2a2d33;color:#e0e0e0;border:1px solid #3a3d43;border-radius:4px;cursor:pointer;font-size:12px;flex:1;">导入 VMD</button>'
+         +     '<button id="chatx2-import-long" style="padding:6px 12px;background:#2a5a3a;color:#a0d0a0;border:1px solid #3a6a4a;border-radius:4px;cursor:pointer;font-size:12px;flex:1;">导入长动作</button>'
+         +   '</div>'
+         + '</div>'
+
+        // 项目外 VMD 备选池：只读浏览，明确加入后才复制进共享动作池
+        + '<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #2a2d33;">'
+        +   '<div style="font-size:12px;color:#9a9da3;margin-bottom:6px;">VMD 备选池（项目外） <span id="chatx2-external-vmd-count" style="color:#a0c0d0;"></span></div>'
+        +   '<div style="font-size:10px;color:#6a6d73;line-height:1.4;margin-bottom:6px;">读取 D:\\trae\\vmd-candidates-20260829；这里只预览和筛选，加入后才复制到共享动作池。</div>'
+        +   '<div id="chatx2-external-vmd-candidates" style="font-size:12px;color:#c0c0c0;max-height:300px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#3a3d43 transparent;"><div style="color:#6a6d73;font-style:italic;padding:8px;">加载中...</div></div>'
+        + '</div>'
+
+         // 语音表情池：共享语义配方 + 当前模型 Profile 支持情况，仅短时预览
+        + '<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #2a2d33;">'
+        +   '<div style="font-size:12px;color:#9a9da3;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">'
+        +     '<span>表情池 <span id="chatx2-expression-count" style="color:#a0c0d0;"></span></span>'
+        +     '<span style="font-size:10px;color:#6a6d73;">语音自动选择</span>'
+        +   '</div>'
+        +   '<div id="chatx2-expression" style="font-size:12px;color:#c0c0c0;max-height:230px;overflow-y:auto;"></div>'
+        + '</div>'
+
+        // 待机轮换池状态
+        + '<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #2a2d33;">'
+        +   '<div style="font-size:12px;color:#9a9da3;margin-bottom:6px;">待机动作轮换池 <span id="chatx2-pool-count" style="color:#a0c0d0;"></span></div>'
+        +   '<div id="chatx2-idle-pool" style="font-size:12px;color:#c0c0c0;max-height:160px;overflow-y:auto;"></div>'
+        +   '<div style="font-size:11px;color:#6a6d73;margin-top:4px;">点击"加入待机"将动作加入轮换池，系统每12-20秒自动切换</div>'
+        + '</div>'
+
+        // 语音动作池（按情绪分组）
+        + '<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #2a2d33;">'
+        +   '<div style="font-size:12px;color:#9a9da3;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">'
+        +     '<span>语音动作池 <span id="chatx2-voice-count" style="color:#a0c0d0;"></span></span>'
+        +     '<button id="chatx2-voice-expand" style="padding:2px 8px;background:#2a2d33;color:#c0c0c0;border:1px solid #3a3d43;border-radius:3px;cursor:pointer;font-size:11px;">全部展开</button>'
+        +   '</div>'
+        +   '<div id="chatx2-voice-pool" style="font-size:12px;color:#c0c0c0;max-height:260px;overflow-y:auto;"></div>'
+        +   '<div style="font-size:11px;color:#6a6d73;margin-top:4px;">所有模型共享。点击"加入语音"把动作按情绪加入语音池，语音播放时自动匹配动作</div>'
+        + '</div>'
+
+        // 打光选项
+        + '<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #2a2d33;">'
+        +   '<div style="font-size:12px;color:#9a9da3;margin-bottom:6px;">打光方案</div>'
+        +   '<div id="chatx2-lighting" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>'
+        +   '<div style="font-size:12px;color:#9a9da3;margin-bottom:6px;">高级打光调节</div>'
+        +   '<div style="margin-bottom:6px;">'
+        +     '<label style="display:block;margin-bottom:3px;font-size:11px;color:#9a9da3;">主光方向 X: <span id="lt-key-x-val">2.0</span> Y: <span id="lt-key-y-val">3.0</span> Z: <span id="lt-key-z-val">4.0</span></label>'
+        +     '<div style="display:flex;gap:4px;">'
+        +       '<input type="range" id="lt-key-x" min="-5" max="5" step="0.1" value="2" style="flex:1;height:4px;">'
+        +       '<input type="range" id="lt-key-y" min="0" max="10" step="0.1" value="3" style="flex:1;height:4px;">'
+        +       '<input type="range" id="lt-key-z" min="-5" max="10" step="0.1" value="4" style="flex:1;height:4px;">'
+        +     '</div>'
+        +   '</div>'
+        +   '<div style="margin-bottom:6px;">'
+        +     '<label style="display:block;margin-bottom:3px;font-size:11px;color:#9a9da3;">主光强度: <span id="lt-key-int-val">2.2</span></label>'
+        +     '<input type="range" id="lt-key-intensity" min="0" max="5" step="0.1" value="2.2" style="width:100%;height:4px;">'
+        +   '</div>'
+        +   '<div style="margin-bottom:6px;">'
+        +     '<label style="display:block;margin-bottom:3px;font-size:11px;color:#9a9da3;">补光强度: <span id="lt-fill-int-val">0.7</span></label>'
+        +     '<input type="range" id="lt-fill-intensity" min="0" max="3" step="0.1" value="0.7" style="width:100%;height:4px;">'
+        +   '</div>'
+        +   '<div style="margin-bottom:6px;">'
+        +     '<label style="display:block;margin-bottom:3px;font-size:11px;color:#9a9da3;">轮廓光强度: <span id="lt-rim-int-val">0.8</span></label>'
+        +     '<input type="range" id="lt-rim-intensity" min="0" max="3" step="0.1" value="0.8" style="width:100%;height:4px;">'
+        +   '</div>'
+        +   '<div style="margin-bottom:6px;">'
+        +     '<label style="display:block;margin-bottom:3px;font-size:11px;color:#9a9da3;">环境光强度: <span id="lt-hemi-int-val">0.9</span></label>'
+        +     '<input type="range" id="lt-hemi-intensity" min="0" max="3" step="0.1" value="0.9" style="width:100%;height:4px;">'
+        +   '</div>'
+        +   '<div style="margin-bottom:6px;">'
+        +     '<label style="display:block;margin-bottom:3px;font-size:11px;color:#9a9da3;">模型对比度: <span id="lt-contrast-val">0</span></label>'
+        +     '<input type="range" id="lt-contrast" min="-1" max="1" step="0.05" value="0" style="width:100%;height:4px;">'
+        +   '</div>'
+        +   '<div style="margin-bottom:6px;">'
+        +     '<label style="display:block;margin-bottom:3px;font-size:11px;color:#9a9da3;">模型饱和度: <span id="lt-saturation-val">0</span></label>'
+        +     '<input type="range" id="lt-saturation" min="-1" max="1" step="0.05" value="0" style="width:100%;height:4px;">'
+        +   '</div>'
+        + '</div>'
+
+        + '<div style="margin-bottom:8px;">'
+        +   '<button id="chatx2-add-pmx" style="width:100%;padding:8px;background:#07c160;color:white;border:none;border-radius:4px;cursor:pointer;font-size:13px;">选择本地 PMX 模型文件</button>'
+        +   '<button id="chatx2-open-models-folder" style="width:100%;margin-top:6px;padding:7px;background:#2a2d33;color:#ddd;border:1px solid #3a3d43;border-radius:4px;cursor:pointer;font-size:12px;">打开专用模型文件夹</button>'
+        + '</div>'
+        // 综合算力：渲染、口型分析和语音动作匹配使用同一档位
+        + '<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #2a2d33;">'
+        +   '<div style="font-size:12px;color:#9a9da3;margin-bottom:6px;">模型表演综合算力</div>'
+        +   '<div id="chatx2-render-quality" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;">'
+        +     '<button class="chatx2-quality-btn" data-level="low" style="padding:4px 10px;background:#2a2d33;color:#c0c0c0;border:1px solid #3a3d43;border-radius:4px;cursor:pointer;font-size:11px;">省电</button>'
+        +     '<button class="chatx2-quality-btn" data-level="medium" style="padding:4px 10px;background:#3a4a5a;color:#fff;border:1px solid #4a5a6a;border-radius:4px;cursor:pointer;font-size:11px;">平衡</button>'
+        +     '<button class="chatx2-quality-btn" data-level="high" style="padding:4px 10px;background:#2a2d33;color:#c0c0c0;border:1px solid #3a3d43;border-radius:4px;cursor:pointer;font-size:11px;">精细</button>'
+        +     '<button class="chatx2-quality-btn" data-level="ultra" style="padding:4px 10px;background:#2a2d33;color:#c0c0c0;border:1px solid #3a3d43;border-radius:4px;cursor:pointer;font-size:11px;">极致</button>'
+        +   '</div>'
+        +   '<div style="font-size:10px;color:#6a6d73;line-height:1.4;">省电: 低渲染负载，粗粒度口型/动作分析<br>平衡: 60帧动画与物理，标准语音动作匹配<br>精细: 更密口型与语义节拍，长句最多3个动作重音<br>极致: 最高渲染、口型与动作匹配预算<br>所有档位均保持物理和动画逐帧运行</div>'
+        + '</div>'
+        + '<div style="font-size:11px;color:#6a6d73;line-height:1.5;">提示：可把包含 PMX 的模型文件夹直接放入 ChatX2 的 models 目录，重启后自动识别；也可从任意文件夹选择 PMX 导入。VMD 动作可导入后在桌宠模式中使用。</div>';
+      document.body.appendChild(panel);
+
+      document.getElementById('chatx2-close').addEventListener('click', function () { panel.style.display = 'none'; });
+      var externalVmdContainer = document.getElementById('chatx2-external-vmd-candidates');
+      if (externalVmdContainer) {
+        externalVmdContainer.addEventListener('click', async function (event) {
+          var button = event.target.closest('button');
+          if (!button || button.disabled) return;
+          var path = button.getAttribute('data-path');
+          if (!path) return;
+          button.disabled = true;
+          try {
+            if (button.classList.contains('chatx2-external-vmd-play')) {
+              var preview = await chatx2.previewExternalVmd(path);
+              if (!preview || !preview.success) alert('播放失败：' + ((preview && preview.reason) || '未知原因'));
+            } else if (button.classList.contains('chatx2-external-vmd-accept')) {
+              var candidate = await chatx2.acceptExternalVmd(path);
+              if (!candidate || !candidate.success) {
+                alert('加入动作池失败：' + ((candidate && candidate.reason) || '未知原因'));
+              } else {
+                alert('已加入动作池：' + (candidate.relativePath || '完成'));
+                await loadMotionPacks();
+                await loadExternalVmdCandidates();
+              }
+            } else if (button.classList.contains('chatx2-external-vmd-delete')) {
+              if (!confirm('将此 VMD 移入备选池回收站？')) return;
+              var removed = await chatx2.deleteExternalVmd(path);
+              if (!removed || !removed.success) {
+                alert('删除失败：' + ((removed && removed.reason) || '未知原因'));
+              } else {
+                await loadExternalVmdCandidates();
+              }
+            }
+          } catch (error) {
+            console.error('[chatx2-ext] external VMD action failed:', error);
+            alert('操作失败：' + (error && error.message ? error.message : String(error)));
+          } finally {
+            button.disabled = false;
+          }
+        });
+      }
+      document.getElementById('chatx2-select').addEventListener('change', async function (e) {
+        var packId = e.target.value;
+        try {
+          var result = await chatx2.switchModelPack(packId);
+          var info = document.getElementById('chatx2-info');
+          if (result.success) {
+            info.textContent = '已切换: ' + (result.displayName || packId);
+            loadMotionPacks();
+            loadExpressionPresets();
+            // 将模型选择保存到当前角色的 profile.json（每个角色独立配置）
+            if (typeof currentCharacterId !== 'undefined' && currentCharacterId) {
+              try {
+                await fetch('/api/characters/' + currentCharacterId + '/model-pack', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ modelPackId: packId })
+                });
+                console.log('[Character] 模型包已保存到角色', currentCharacterId, ':', packId);
+              } catch (saveErr) {
+                console.warn('[Character] 保存模型包到角色失败:', saveErr);
+              }
+            }
+          } else {
+            info.textContent = '切换失败: ' + (result.reason || '未知原因');
+          }
+        } catch (e2) {
+          alert('切换失败: ' + (e2.message || e2));
+        }
+      });
+      document.getElementById('chatx2-import').addEventListener('click', async function () {
+        try {
+          var result = await chatx2.importVmd();
+          if (result.success) {
+            alert('VMD 导入成功: ' + result.relativePath);
+            loadMotionPacks();
+          } else if (result.reason !== 'cancelled') {
+            alert('VMD 导入失败: ' + (result.reason || '未知原因'));
+          }
+        } catch (e2) {
+          alert('VMD 导入失败: ' + (e2.message || e2));
+        }
+      });
+      document.getElementById('chatx2-import-long').addEventListener('click', async function () {
+        try {
+          var result = await chatx2.importLongVmd();
+          if (result.success) {
+            alert('长时间 VMD 导入成功: ' + (result.imported || []).join(', '));
+            loadMotionPacks();
+          } else if (result.reason !== 'cancelled') {
+            alert('长时间 VMD 导入失败: ' + (result.reason || '未知原因'));
+          }
+        } catch (e2) {
+          alert('长时间 VMD 导入失败: ' + (e2.message || e2));
+        }
+      });
+      document.getElementById('chatx2-add-pmx').addEventListener('click', async function () {
+        try {
+          var result = await chatx2.selectPmxModel();
+          if (result.success) {
+            alert('模型切换成功');
+            if (result.packId && typeof currentCharacterId !== 'undefined' && currentCharacterId) {
+              try {
+                await fetch('/api/characters/' + currentCharacterId + '/model-pack', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ modelPackId: result.packId })
+                });
+              } catch (saveErr) {
+                console.warn('[Character] 导入模型后保存角色模型设置失败:', saveErr);
+              }
+            }
+            loadModelList();
+          } else if (result.reason !== 'cancelled') {
+            alert('模型切换失败: ' + (result.reason || '未知原因'));
+          }
+        } catch (e2) {
+          alert('模型切换失败: ' + (e2.message || e2));
+        }
+      });
+      document.getElementById('chatx2-open-models-folder').addEventListener('click', async function () {
+        try {
+          var result = await chatx2.openModelsFolder();
+          if (!result.success) alert('打开模型文件夹失败: ' + (result.reason || '未知原因'));
+        } catch (e2) {
+          alert('打开模型文件夹失败: ' + (e2.message || e2));
+        }
+      });
+
+      loadModelList();
+      loadMotionPacks();
+      loadLightingPresets();
+      loadExpressionPresets();
+      loadExternalVmdCandidates();
+      bindLightingSliders();
+      initRenderQualityButtons();
+      // 绑定动态创建的面板元素事件（搜索框 + 动作按钮）
+      _bindVmdSearch();
+      _bindVmdEvents();
+    }
+
+    function bindLightingSliders() {
+      var sliders = ['lt-key-x', 'lt-key-y', 'lt-key-z', 'lt-key-intensity', 'lt-fill-intensity', 'lt-rim-intensity', 'lt-hemi-intensity', 'lt-contrast', 'lt-saturation'];
+      var valIds = { 'lt-key-x': 'lt-key-x-val', 'lt-key-y': 'lt-key-y-val', 'lt-key-z': 'lt-key-z-val', 'lt-key-intensity': 'lt-key-int-val', 'lt-fill-intensity': 'lt-fill-int-val', 'lt-rim-intensity': 'lt-rim-int-val', 'lt-hemi-intensity': 'lt-hemi-int-val', 'lt-contrast': 'lt-contrast-val', 'lt-saturation': 'lt-saturation-val' };
+      var timer = null;
+      function applyDynamic() {
+        var keyX = parseFloat(document.getElementById('lt-key-x').value) || 2;
+        var keyY = parseFloat(document.getElementById('lt-key-y').value) || 3;
+        var keyZ = parseFloat(document.getElementById('lt-key-z').value) || 4;
+        var keyInt = parseFloat(document.getElementById('lt-key-intensity').value) || 2.2;
+        var fillInt = parseFloat(document.getElementById('lt-fill-intensity').value) || 0.7;
+        var rimInt = parseFloat(document.getElementById('lt-rim-intensity').value) || 0.8;
+        var hemiInt = parseFloat(document.getElementById('lt-hemi-intensity').value) || 0.9;
+        var contrast = parseFloat(document.getElementById('lt-contrast').value);
+        if (!Number.isFinite(contrast)) contrast = 0;
+        var saturation = parseFloat(document.getElementById('lt-saturation').value);
+        if (!Number.isFinite(saturation)) saturation = 0;
+        chatx2.setLightingDynamic({ keyIntensity: keyInt, keyX: keyX, keyY: keyY, keyZ: keyZ, fillIntensity: fillInt, rimIntensity: rimInt, hemiIntensity: hemiInt, contrast: contrast, saturation: saturation }).catch(function(){});
+      }
+      sliders.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('input', function() {
+          var valEl = document.getElementById(valIds[id]);
+          if (valEl) valEl.textContent = el.value;
+          if (timer) clearTimeout(timer);
+          timer = setTimeout(applyDynamic, 80);
+        });
+      });
+    }
+
+    function applyLightingStateToSliders(dynamic) {
+      var ids = {
+        keyX: 'lt-key-x', keyY: 'lt-key-y', keyZ: 'lt-key-z',
+        keyIntensity: 'lt-key-intensity', fillIntensity: 'lt-fill-intensity',
+        rimIntensity: 'lt-rim-intensity', hemiIntensity: 'lt-hemi-intensity', contrast: 'lt-contrast', saturation: 'lt-saturation'
+      };
+      var valueIds = {
+        keyX: 'lt-key-x-val', keyY: 'lt-key-y-val', keyZ: 'lt-key-z-val',
+        keyIntensity: 'lt-key-int-val', fillIntensity: 'lt-fill-int-val',
+        rimIntensity: 'lt-rim-int-val', hemiIntensity: 'lt-hemi-int-val', contrast: 'lt-contrast-val', saturation: 'lt-saturation-val'
+      };
+      Object.keys(ids).forEach(function (key) {
+        var slider = document.getElementById(ids[key]);
+        var value = document.getElementById(valueIds[key]);
+        var stateValue = dynamic[key];
+        if (typeof stateValue !== 'number') {
+          if (key !== 'contrast' && key !== 'saturation') return;
+          stateValue = 0;
+        }
+        if (slider) slider.value = String(stateValue);
+        if (value) value.textContent = String(stateValue);
+      });
+    }
+
+    async function loadModelList() {
+      try {
+        var packs = await chatx2.listModelPacks();
+        var current = await chatx2.getCurrentModelPack();
+        var select = document.getElementById('chatx2-select');
+        var info = document.getElementById('chatx2-info');
+        if (!select) return;
+        select.innerHTML = packs.map(function (p) {
+          var sel = current.packId === p.packId ? ' selected' : '';
+          var tag = p.isBuiltIn ? ' (内置)' : '';
+          return '<option value="' + p.packId + '"' + sel + '>' + p.displayName + tag + '</option>';
+        }).join('');
+        if (info) {
+          info.textContent = current.success
+            ? '当前: ' + (current.displayName || current.packId) + (current.capabilities ? '\n能力: ' + current.capabilities.join(', ') : '')
+            : '未加载模型';
+        }
+      } catch (e) {
+        console.error('[chatx2-ext] loadModelList failed:', e);
+      }
+    }
+
+    var _externalVmdCategoryNames = {
+      short: '短动作（≤3秒）',
+      medium: '中动作（3–8秒）',
+      long: '长动作/待机候选（>8秒）'
+    };
+
+    // 加载项目外 VMD 备选池。候选源文件始终保留在项目外，只有用户点击
+    // “加入动作池”时才由主进程复制到共享 motions/<时长>/目录。
+    async function loadExternalVmdCandidates() {
+      var container = document.getElementById('chatx2-external-vmd-candidates');
+      var count = document.getElementById('chatx2-external-vmd-count');
+      if (!container || typeof chatx2.listExternalVmdCandidates !== 'function') return;
+      try {
+        var result = await chatx2.listExternalVmdCandidates();
+        var items = result && result.success && Array.isArray(result.items) ? result.items : [];
+        if (count) count.textContent = '（' + items.length + ' 个）';
+        if (items.length === 0) {
+          container.innerHTML = '<div style="color:#6a6d73;font-style:italic;padding:8px;">暂无外部 VMD 候选</div>';
+          return;
+        }
+        container.innerHTML = ['short', 'medium', 'long'].map(function(category) {
+          var categoryItems = items.filter(function(item) { return item.category === category; });
+          if (categoryItems.length === 0) return '';
+          var rows = categoryItems.map(function(item) {
+            var displayName = escapeHtml(item.displayName || item.path || '未命名 VMD');
+            var relativePath = escapeHtml(item.path || '');
+            var duration = Number(item.duration);
+            var durationText = Number.isFinite(duration) && duration > 0 ? duration.toFixed(2) + ' 秒' : '无法解析';
+            var size = Number(item.size);
+            var sizeText = Number.isFinite(size) ? (size / 1024).toFixed(1) + ' KB' : '-';
+            var valid = item.valid === true;
+            var status = valid ? '可播放' : '无效或不支持';
+            var playDisabled = valid ? '' : ' disabled';
+            return '<div class="chatx2-external-vmd-item" style="padding:7px 6px;margin:3px 0;border-radius:4px;background:#15181e;border:1px solid #252a33;">'
+              + '<div style="display:flex;align-items:center;gap:6px;min-width:0;">'
+              +   '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:' + (valid ? '#c8ccd4' : '#8a6a6a') + ';" title="' + relativePath + '">' + displayName + '</span>'
+              +   '<span style="flex-shrink:0;color:#737982;font-size:10px;">' + durationText + '</span>'
+              + '</div>'
+              + '<div style="margin-top:3px;color:#68717e;font-size:10px;overflow-wrap:anywhere;">' + relativePath + ' · ' + sizeText + ' · ' + status + '</div>'
+              + '<div style="display:flex;gap:4px;margin-top:5px;">'
+              +   '<button class="chatx2-external-vmd-play" data-path="' + relativePath + '"' + playDisabled + ' style="padding:2px 8px;background:#2a4a3a;color:#a0d0a0;border:1px solid #3a5a4a;border-radius:3px;cursor:pointer;font-size:10px;">播放</button>'
+              +   '<button class="chatx2-external-vmd-accept" data-path="' + relativePath + '"' + playDisabled + ' style="padding:2px 8px;background:#2a3f5a;color:#a0c0e0;border:1px solid #3a5a7a;border-radius:3px;cursor:pointer;font-size:10px;">加入动作池</button>'
+              +   '<button class="chatx2-external-vmd-delete" data-path="' + relativePath + '" style="padding:2px 8px;background:#5a2a2a;color:#d0a0a0;border:1px solid #6a3a3a;border-radius:3px;cursor:pointer;font-size:10px;">删除</button>'
+              + '</div>'
+              + '</div>';
+          }).join('');
+          return '<div style="margin:8px 0 3px;color:#aab8d8;font-size:11px;font-weight:bold;border-bottom:1px solid #2a2d33;padding-bottom:2px;">'
+            + _externalVmdCategoryNames[category] + ' · ' + categoryItems.length + '</div>' + rows;
+        }).join('');
+      } catch (e) {
+        if (count) count.textContent = '';
+        container.innerHTML = '<div style="color:#d08080;padding:8px;">外部候选加载失败</div>';
+        console.error('[chatx2-ext] loadExternalVmdCandidates failed:', e);
+      }
+    }
+
+    // 当前搜索关键词和全量数据（用于搜索过滤）
+    var _vmdSearchKeyword = '';
+    var _vmdAllItems = [];
+
+    // 情绪中文名映射
+    var _emotionNames = {
+      neutral: '中性/平淡',
+      happy: '开心',
+      sad: '悲伤',
+      angry: '愤怒',
+      surprised: '惊讶',
+      shy: '害羞',
+      thinking: '思考',
+      explaining: '解释',
+      concerned: '关切',
+      playful: '俏皮',
+      serious: '严肃',
+      grateful: '感激',
+      worried: '担心',
+      excited: '兴奋',
+      calm: '平静',
+      like: '喜欢',
+      greet: '问候',
+      goodbye: '告别',
+      apologize: '道歉',
+      encourage: '鼓励'
+    };
+    var _emotionKeys = Object.keys(_emotionNames);
+    var _voiceActionEntries = [];
+    var _voiceActionGrouped = {};
+    var _voiceActionEditorSession = 0;
+
+    async function loadMotionPacks() {
+      try {
+        // 同时加载语音动作池，用于判断每个 VMD 是否已加入语音池
+        try {
+          var vaResult = await chatx2.listVoiceActions();
+          if (vaResult.success) {
+            _voiceActionEntries = vaResult.entries || [];
+            _voiceActionGrouped = vaResult.grouped || {};
+          }
+        } catch (vaErr) {
+          console.warn('[chatx2-ext] listVoiceActions failed:', vaErr);
+          _voiceActionEntries = [];
+          _voiceActionGrouped = {};
+        }
+
+        // 优先使用新的带时长分类 API；失败时回退到旧 API
+        var result;
+        var useNewApi = typeof chatx2.listVmdWithInfo === 'function';
+        if (useNewApi) {
+          result = await chatx2.listVmdWithInfo();
+        } else {
+          result = await chatx2.listAllMotionPacks();
+        }
+        if (!result.success) return;
+        var vmd = document.getElementById('chatx2-vmd');
+        var vmdCount = document.getElementById('chatx2-vmd-count');
+        var idlePool = result.idleVmdPool || [];
+        var poolContainer = document.getElementById('chatx2-idle-pool');
+        var poolCount = document.getElementById('chatx2-pool-count');
+
+        // 更新待机轮换池状态（含播放按钮）
+        if (poolCount) {
+          poolCount.textContent = idlePool.length > 0 ? '(' + idlePool.length + '个动作)' : '(空)';
+        }
+        if (poolContainer) {
+          if (idlePool.length === 0) {
+            poolContainer.innerHTML = '<div style="color:#6a6d73;font-style:italic;">未选择轮换动作，将使用默认待机动作</div>';
+          } else {
+            poolContainer.innerHTML = idlePool.slice(0, 4).map(function (p, slotIndex) {
+              var display = useNewApi && result.items ? (result.items.find(function(it){return it.path===p;}) || {}).displayName : p;
+              var dur = useNewApi && result.items ? (result.items.find(function(it){return it.path===p;}) || {}).duration : 0;
+              var durStr = (dur && dur > 0) ? ' (' + dur.toFixed(1) + 's)' : '';
+              var label = display || p;
+              return '<div style="padding:2px 6px;margin:2px 0;border-radius:3px;background:#1a2a3a;color:#a0c0d0;font-size:11px;display:flex;align-items:center;justify-content:space-between;gap:4px;">'
+                + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;" title="待机动作 ' + (slotIndex + 1) + ': ' + label + ' ' + durStr + '"><strong style="color:#f0c060;">★' + (slotIndex + 1) + '</strong> ' + label + '<span style="color:#5a7a8a;">' + durStr + '</span></span>'
+                + '<span style="display:flex;gap:3px;flex-shrink:0;">'
+                + '<button class="chatx2-pool-play" data-path="' + p + '" style="padding:1px 6px;background:#2a4a3a;color:#a0d0a0;border:1px solid #3a5a4a;border-radius:3px;cursor:pointer;font-size:10px;" title="预览此动作">播放</button>'
+                + '<button class="chatx2-pool-remove" data-path="' + p + '" style="padding:1px 6px;background:#3a2a2a;color:#d08080;border:1px solid #4a3a3a;border-radius:3px;cursor:pointer;font-size:10px;" title="从轮换池移除">移除</button>'
+                + '</span>'
+                + '</div>';
+            }).join('');
+          }
+        }
+
+        // 构造全量 items 列表（新 API 已含 displayName/duration/category）
+        var items;
+        if (useNewApi && result.items) {
+          items = result.items;
+        } else {
+          // 回退：旧 API 只有路径数组，前端构造 items
+          var allPaths = Array.from(new Set([
+            ...(result.customVmd || []),
+            ...(result.longActionVmd || []),
+            ...(result.idleVmdPool || [])
+          ]));
+          items = allPaths.map(function(p) {
+            return { path: p, displayName: p.replace(/^.*\//, '').replace(/\.vmd$/i, ''), duration: 0, category: 'medium' };
+          });
+        }
+        _vmdAllItems = items;
+        if (vmdCount) {
+          vmdCount.textContent = '(' + items.length + '个)';
+        }
+
+        // 按搜索关键词过滤
+        var filtered = items.filter(function(it) {
+          if (!_vmdSearchKeyword) return true;
+          return it.displayName.toLowerCase().indexOf(_vmdSearchKeyword.toLowerCase()) >= 0
+            || it.path.toLowerCase().indexOf(_vmdSearchKeyword.toLowerCase()) >= 0;
+        });
+
+        // 按分类分组渲染
+        var shortItems = filtered.filter(function(it){return it.category==='short';});
+        var mediumItems = filtered.filter(function(it){return it.category==='medium';});
+        var longItems = filtered.filter(function(it){return it.category==='long';});
+
+        var defaultIdle = result.defaultIdle || '';
+
+        function renderItem(it) {
+          var isDefault = defaultIdle === it.path;
+          var idleSlotIndex = idlePool.indexOf(it.path);
+          var inPool = idleSlotIndex >= 0;
+          var idlePoolFull = idlePool.length >= 4;
+          var existingVa = _voiceActionEntries.find(function(e){ return e.vmdPath === it.path; });
+          var isAvailable = it.available !== false;
+          var markers = (isDefault ? '默认 ' : '') + (inPool ? '★' + (idleSlotIndex + 1) + ' ' : '');
+          var nameColor = !isAvailable ? '#8a5a5a' : ((isDefault || inPool) ? '#f0c060' : '#c0c0c0');
+          var durStr = (it.duration && it.duration > 0) ? ' <span style="color:#5a6a7a;font-size:10px;">' + it.duration.toFixed(1) + 's</span>' : '';
+          var availabilityLabel = isAvailable ? '' : ' <span style="color:#d08080;font-size:10px;">缺失</span>';
+          // 判断是长动作（>8s）用 previewLongVmd，否则用 previewCustomVmd
+          var isLong = it.category === 'long';
+          var playClass = isLong ? 'chatx2-vmd-longplay' : 'chatx2-vmd-play';
+          var deleteClass = isLong ? 'chatx2-vmd-longdelete' : 'chatx2-vmd-delete';
+          return '<div class="chatx2-vmd-item" data-path="' + it.path + '" style="display:flex;align-items:center;justify-content:space-between;padding:4px 6px;margin:2px 0;border-radius:4px;background:transparent;" onmouseover="this.style.background=\'#25282e\'" onmouseout="this.style.background=\'transparent\'">'
+            + '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:6px;color:' + nameColor + ';min-width:0;" title="' + it.path + '">' + markers + it.displayName + durStr + availabilityLabel + '</span>'
+            + '<span style="display:flex;gap:4px;flex-shrink:0;">'
+            + '<button class="' + playClass + '" data-path="' + it.path + '" style="padding:2px 8px;background:' + (isAvailable ? '#2a5a3a' : '#3a2a2a') + ';color:' + (isAvailable ? '#a0d0a0' : '#8a6a6a') + ';border:1px solid ' + (isAvailable ? '#3a6a4a' : '#4a3a3a') + ';border-radius:3px;cursor:' + (isAvailable ? 'pointer' : 'not-allowed') + ';font-size:11px;" title="' + (isAvailable ? '在桌宠窗口中预览' : '动作文件不存在') + '"' + (isAvailable ? '' : ' disabled') + '>播放</button>'
+            + (isDefault
+              ? '<button class="chatx2-vmd-default active" data-path="' + it.path + '" style="padding:2px 8px;background:#5a4a2a;color:#f0c060;border:1px solid #6a5a3a;border-radius:3px;cursor:default;font-size:11px;" title="当前默认待机动作" disabled>默认</button>'
+              : '<button class="chatx2-vmd-default" data-path="' + it.path + '" style="padding:2px 8px;background:#2a2d33;color:#c0c0c0;border:1px solid #3a3d43;border-radius:3px;cursor:pointer;font-size:11px;" title="设为默认待机动作">设为默认</button>')
+            + (inPool
+              ? '<button class="chatx2-vmd-idlepool active" data-path="' + it.path + '" style="padding:2px 8px;background:#2a4a5a;color:#a0c0d0;border:1px solid #3a5a6a;border-radius:3px;cursor:pointer;font-size:11px;" title="待机动作 ' + (idleSlotIndex + 1) + '，点击移除">★' + (idleSlotIndex + 1) + ' 待机</button>'
+              : '<button class="chatx2-vmd-idlepool" data-path="' + it.path + '" style="padding:2px 8px;background:#2a2d33;color:' + (idlePoolFull ? '#666' : '#c0c0c0') + ';border:1px solid #3a3d43;border-radius:3px;cursor:' + (idlePoolFull ? 'not-allowed' : 'pointer') + ';font-size:11px;" title="' + (idlePoolFull ? '最多只能选择 4 个待机动作' : '加入待机轮换池，多个动作自动轮换') + '"' + (idlePoolFull ? ' disabled' : '') + '>加入待机</button>')
+            + (existingVa
+              ? '<button class="chatx2-vmd-voice active" data-path="' + it.path + '" style="padding:2px 8px;background:#4a3a5a;color:#d0b0e0;border:1px solid #5a4a6a;border-radius:3px;cursor:pointer;font-size:11px;" title="编辑语音情绪">语音中</button>'
+              : '<button class="chatx2-vmd-voice" data-path="' + it.path + '" style="padding:2px 8px;background:#2a2d33;color:#c0c0c0;border:1px solid #3a3d43;border-radius:3px;cursor:pointer;font-size:11px;" title="加入语音动作池">加入语音</button>')
+            + '<button class="' + deleteClass + '" data-path="' + it.path + '" style="padding:2px 8px;background:#5a2a2a;color:#d0a0a0;border:1px solid #6a3a3a;border-radius:3px;cursor:pointer;font-size:11px;" title="删除此动作">删除</button>'
+            + '</span>'
+            + '</div>';
+        }
+
+        function renderCategory(title, list, color, catKey) {
+          if (list.length === 0) return '';
+          var html = '<div style="margin:8px 0 2px;font-size:11px;color:' + color + ';font-weight:bold;border-bottom:1px solid #2a2d33;padding-bottom:2px;display:flex;align-items:center;justify-content:space-between;">'
+            + '<span>' + title + ' (' + list.length + ')</span>'
+            + '</div>';
+          html += '<div class="chatx2-cat-scroll chatx2-cat-scroll-' + catKey + '" style="max-height:260px;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#3a3d43 transparent;margin-bottom:4px;">' + list.map(renderItem).join('') + '</div>';
+          return html;
+        }
+
+        var html = '';
+        if (filtered.length === 0) {
+          html = '<div style="color:#6a6d73;font-style:italic;padding:8px;">无匹配动作</div>';
+        } else {
+          html += renderCategory('短动作 (≤3秒)', shortItems, '#a0d0a0', 'short');
+          html += renderCategory('中动作 (3-8秒)', mediumItems, '#a0c0d0', 'medium');
+          html += renderCategory('长动作 (>8秒)', longItems, '#d0a0c0', 'long');
+        }
+        // 保存各分类滚动区和面板本身的滚动位置，重绘后恢复
+        var savedScrolls = {};
+        document.querySelectorAll('.chatx2-cat-scroll').forEach(function(el) {
+          savedScrolls[el.className.match(/chatx2-cat-scroll-(\w+)/) ? el.className.match(/chatx2-cat-scroll-(\w+)/)[1] : ''] = el.scrollTop;
+        });
+        var panelEl = document.getElementById('chatx2-model-panel');
+        var savedPanelScroll = panelEl ? panelEl.scrollTop : 0;
+        vmd.innerHTML = html;
+        // 恢复滚动位置
+        document.querySelectorAll('.chatx2-cat-scroll').forEach(function(el) {
+          var key = el.className.match(/chatx2-cat-scroll-(\w+)/);
+          if (key && savedScrolls[key[1]] !== undefined) el.scrollTop = savedScrolls[key[1]];
+        });
+        if (panelEl) panelEl.scrollTop = savedPanelScroll;
+
+        // 渲染语音动作池
+        loadVoiceActions();
+      } catch (e) {
+        console.error('[chatx2-ext] loadMotionPacks failed:', e);
+        var vmdErr = document.getElementById('chatx2-vmd');
+        if (vmdErr) vmdErr.innerHTML = '<div style="color:#d08080;padding:8px;">加载失败: ' + (e && e.message ? e.message : String(e)) + '</div>';
+      }
+    }
+
+    // 渲染语音动作池（按情绪分组）
+    async function loadVoiceActions() {
+      try {
+        var container = document.getElementById('chatx2-voice-pool');
+        var countEl = document.getElementById('chatx2-voice-count');
+        if (!container) return;
+
+        // 刷新全量数据
+        try {
+          var vaResult = await chatx2.listVoiceActions();
+          if (vaResult.success) {
+            _voiceActionEntries = vaResult.entries || [];
+            _voiceActionGrouped = vaResult.grouped || {};
+          }
+        } catch (vaErr) {
+          console.warn('[chatx2-ext] listVoiceActions failed:', vaErr);
+        }
+
+        var total = _voiceActionEntries.length;
+        if (countEl) countEl.textContent = total > 0 ? '(' + total + '个动作)' : '(空)';
+
+        if (total === 0) {
+          container.innerHTML = '<div style="color:#6a6d73;font-style:italic;padding:8px;">暂无语音动作，在动作库中点击"加入语音"添加</div>';
+          return;
+        }
+
+        var emotions = Object.keys(_voiceActionGrouped).sort();
+        var html = '';
+        emotions.forEach(function(emotion) {
+          var entries = _voiceActionGrouped[emotion];
+          var emotionName = _emotionNames[emotion] || emotion;
+          var groupId = 'chatx2-voice-group-' + emotion;
+          html += '<div style="margin:6px 0;border:1px solid #2a2d33;border-radius:4px;overflow:hidden;">';
+          html += '<div class="chatx2-voice-group-header" data-emotion="' + emotion + '" style="padding:6px 8px;background:#22252b;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#c0c0c0;">'
+            + '<span>' + emotionName + ' <span style="color:#a0c0d0;">(' + entries.length + ')</span></span>'
+            + '<span class="chatx2-voice-toggle" style="color:#888;font-size:11px;">▼</span>'
+            + '</div>';
+          html += '<div id="' + groupId + '" class="chatx2-voice-group-items" style="display:block;padding:4px 6px;background:#1a1d23;">';
+          entries.forEach(function(entry) {
+            var durStr = entry.duration && entry.duration > 0 ? ' <span style="color:#5a6a7a;font-size:10px;">' + entry.duration.toFixed(1) + 's</span>' : '';
+            html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;font-size:11px;color:#c0c0c0;">'
+              + '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:6px;" title="' + entry.vmdPath + '">' + entry.displayName + durStr + '</span>'
+              + '<span style="display:flex;gap:3px;flex-shrink:0;">'
+              + '<button class="chatx2-voice-play" data-path="' + entry.vmdPath + '" style="padding:1px 5px;background:#2a4a3a;color:#a0d0a0;border:1px solid #3a5a4a;border-radius:3px;cursor:pointer;font-size:10px;">播放</button>'
+              + '<button class="chatx2-voice-safe-toggle" data-path="' + entry.vmdPath + '" title="允许/禁止语音 Planner 自动选用" style="padding:1px 5px;background:' + (entry.dialogueSafe === true ? '#24452f' : '#392b2b') + ';color:' + (entry.dialogueSafe === true ? '#9dddaf' : '#ba8e8e') + ';border:1px solid #4a4a5a;border-radius:3px;cursor:pointer;font-size:10px;">' + (entry.dialogueSafe === true ? '语音✓' : '语音×') + '</button>'
+              + '<button class="chatx2-voice-edit" data-path="' + entry.vmdPath + '" style="padding:1px 5px;background:#3a3a4a;color:#b0b0c0;border:1px solid #4a4a5a;border-radius:3px;cursor:pointer;font-size:10px;">编辑</button>'
+              + '<button class="chatx2-voice-remove" data-path="' + entry.vmdPath + '" style="padding:1px 5px;background:#4a2a2a;color:#d08080;border:1px solid #5a3a3a;border-radius:3px;cursor:pointer;font-size:10px;">移除</button>'
+              + '</span>'
+              + '</div>';
+          });
+          html += '</div></div>';
+        });
+        container.innerHTML = html;
+      } catch (e) {
+        console.error('[chatx2-ext] loadVoiceActions failed:', e);
+      }
+    }
+
+    // 语音动作情绪编辑器弹窗
+    function openVoiceActionEditor(vmdPath, existingEntry) {
+      var editorSession = ++_voiceActionEditorSession;
+      var vmdItem = _vmdAllItems.find(function(it){ return it.path === vmdPath; });
+      var displayName = existingEntry ? existingEntry.displayName : (vmdItem ? vmdItem.displayName : vmdPath.replace(/^.*\//, '').replace(/\.vmd$/i, ''));
+      var duration = vmdItem ? vmdItem.duration : 0;
+      var currentEmotions = existingEntry && existingEntry.emotions ? existingEntry.emotions : ['neutral'];
+      var description = existingEntry && existingEntry.description ? existingEntry.description : '';
+      var gestureFamily = existingEntry && existingEntry.gestureFamily ? existingEntry.gestureFamily : '';
+      var intent = existingEntry && existingEntry.intent ? existingEntry.intent : '';
+      var dialogueSafe = existingEntry ? (existingEntry.dialogueSafe !== false) : true;
+
+      // 创建遮罩和弹窗
+      // Remove a stale editor left by a renderer refresh before creating the
+      // next one. Duplicate IDs can direct typing/saving to a hidden control.
+      var staleOverlay = document.getElementById('chatx2-voice-editor-overlay');
+      if (staleOverlay && staleOverlay.parentNode) staleOverlay.parentNode.removeChild(staleOverlay);
+      var overlay = document.createElement('div');
+      overlay.id = 'chatx2-voice-editor-overlay';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.tabIndex = -1;
+      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:20000;display:flex;align-items:center;justify-content:center;';
+
+      var emotionChecks = _emotionKeys.map(function(key){
+        var checked = currentEmotions.indexOf(key) >= 0 ? 'checked' : '';
+        return '<label style="display:flex;align-items:center;gap:4px;padding:4px 6px;background:#22252b;border-radius:3px;cursor:pointer;font-size:12px;color:#c0c0c0;">'
+          + '<input type="checkbox" name="chatx2-voice-emotion" value="' + key + '" ' + checked + '>'
+          + _emotionNames[key]
+          + '</label>';
+      }).join('');
+
+      overlay.innerHTML = ''
+        + '<div style="background:#1a1d23;border:1px solid #2a2d33;border-radius:8px;padding:16px;width:420px;max-height:90vh;overflow-y:auto;box-shadow:0 4px 20px rgba(0,0,0,0.5);color:#e0e0e0;font-size:13px;">'
+        +   '<div style="font-size:15px;font-weight:bold;margin-bottom:12px;">' + (existingEntry ? '编辑语音动作' : '加入语音动作池') + '</div>'
+        +   '<div style="margin-bottom:12px;padding:8px;background:#22252b;border-radius:4px;font-size:12px;color:#a0c0d0;">' + displayName + (duration > 0 ? ' (' + duration.toFixed(1) + 's)' : '') + '</div>'
+        +   '<div style="margin-bottom:8px;font-size:12px;color:#9a9da3;">匹配情绪（可多选）</div>'
+        +   '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">' + emotionChecks + '</div>'
+        +   '<div style="margin-bottom:8px;font-size:12px;color:#9a9da3;">手势家族（可选）</div>'
+        +   '<input id="chatx2-voice-gesture" type="text" value="' + escapeHtml(gestureFamily) + '" placeholder="如 bow, wave, nod" style="width:100%;padding:6px 8px;background:#0f1115;color:#e0e0e0;border:1px solid #2a2d33;border-radius:4px;font-size:12px;box-sizing:border-box;margin-bottom:10px;">'
+        +   '<div style="margin-bottom:8px;font-size:12px;color:#9a9da3;">意图（可选）</div>'
+        +   '<input id="chatx2-voice-intent" type="text" value="' + escapeHtml(intent) + '" placeholder="如 greeting, explain" style="width:100%;padding:6px 8px;background:#0f1115;color:#e0e0e0;border:1px solid #2a2d33;border-radius:4px;font-size:12px;box-sizing:border-box;margin-bottom:10px;">'
+        +   '<div style="margin-bottom:8px;font-size:12px;color:#9a9da3;">描述（可选）</div>'
+        +   '<input id="chatx2-voice-desc" type="text" value="' + escapeHtml(description) + '" placeholder="动作描述..." style="width:100%;padding:6px 8px;background:#0f1115;color:#e0e0e0;border:1px solid #2a2d33;border-radius:4px;font-size:12px;box-sizing:border-box;margin-bottom:12px;">'
+        +   '<label style="display:flex;align-items:center;gap:6px;margin-bottom:14px;font-size:12px;color:#c0c0c0;cursor:pointer;">'
+        +     '<input type="checkbox" id="chatx2-voice-safe" ' + (dialogueSafe ? 'checked' : '') + '>'
+        +     '可被语音 Planner 自动选用（dialogueSafe）'
+        +   '</label>'
+        +   '<div style="display:flex;gap:8px;justify-content:flex-end;">'
+        +     '<button id="chatx2-voice-cancel" style="padding:6px 14px;background:#2a2d33;color:#c0c0c0;border:1px solid #3a3d43;border-radius:4px;cursor:pointer;font-size:12px;">取消</button>'
+        +     '<button id="chatx2-voice-save" style="padding:6px 14px;background:#2a5a3a;color:#a0d0a0;border:1px solid #3a6a4a;border-radius:4px;cursor:pointer;font-size:12px;">保存</button>'
+        +   '</div>'
+        + '</div>';
+
+      document.body.appendChild(overlay);
+
+      var gestureInput = overlay.querySelector('#chatx2-voice-gesture');
+      var intentInput = overlay.querySelector('#chatx2-voice-intent');
+      var descriptionInput = overlay.querySelector('#chatx2-voice-desc');
+      var editorInputs = [gestureInput, intentInput, descriptionInput].filter(Boolean);
+      editorInputs.forEach(function(input) {
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+        // Explicit no-drag/pointer styles keep these controls editable if the
+        // host window later introduces draggable regions.
+        input.style.webkitAppRegion = 'no-drag';
+        input.style.pointerEvents = 'auto';
+        input.style.userSelect = 'text';
+      });
+      // Focus immediately after insertion, then verify again on the next
+      // frame. Chromium can defer a frame callback while the model panel is
+      // still laying out; immediate focus makes the first keystroke reliable.
+      if (gestureInput) gestureInput.focus({ preventScroll: true });
+      requestAnimationFrame(function() {
+        if (gestureInput && overlay.isConnected
+          && !overlay.contains(document.activeElement)) gestureInput.focus({ preventScroll: true });
+      });
+
+      // Each opening owns one focus session. A model-config refresh, delayed
+      // chat initialization, or the completion of the previous save can fire
+      // after the user has already opened the next action. Keep keyboard focus
+      // inside the current modal without redirecting normal clicks between its
+      // own fields, checkboxes and buttons.
+      function keepEditorFocus(e) {
+        if (editorSession !== _voiceActionEditorSession || !overlay.isConnected) return;
+        if (overlay.contains(e.target)) return;
+        var fallback = editorInputs.find(function(input) {
+          return input === document.activeElement;
+        }) || gestureInput;
+        if (fallback) {
+          setTimeout(function() {
+            if (editorSession === _voiceActionEditorSession && overlay.isConnected
+              && !overlay.contains(document.activeElement)) fallback.focus({ preventScroll: true });
+          }, 0);
+        }
+      }
+      document.addEventListener('focusin', keepEditorFocus, true);
+
+      function close() {
+        document.removeEventListener('focusin', keepEditorFocus, true);
+        if (editorSession === _voiceActionEditorSession) _voiceActionEditorSession += 1;
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      }
+
+      overlay.addEventListener('click', function(e){
+        if (e.target === overlay) close();
+      });
+      // 阻止键盘事件冒泡到 document，防止被全局处理器拦截导致无法键入
+      var editorBox = overlay.firstElementChild;
+      ['keydown', 'keypress', 'keyup', 'input'].forEach(function(evtName) {
+        editorBox.addEventListener(evtName, function(e) { e.stopPropagation(); });
+      });
+      document.getElementById('chatx2-voice-cancel').addEventListener('click', close);
+      document.getElementById('chatx2-voice-save').addEventListener('click', async function(){
+        var checkedBoxes = overlay.querySelectorAll('input[name="chatx2-voice-emotion"]:checked');
+        var emotions = Array.from(checkedBoxes).map(function(cb){ return cb.value; });
+        if (emotions.length === 0) {
+          alert('请至少选择一个情绪');
+          return;
+        }
+        var newGesture = gestureInput.value.trim();
+        var newIntent = intentInput.value.trim();
+        var newDesc = descriptionInput.value.trim();
+        var newSafe = overlay.querySelector('#chatx2-voice-safe').checked;
+
+        try {
+          var res;
+          if (existingEntry) {
+            res = await chatx2.updateVoiceAction(vmdPath, {
+              emotions: emotions,
+              gestureFamily: newGesture,
+              intent: newIntent,
+              description: newDesc,
+              dialogueSafe: newSafe
+            });
+          } else {
+            res = await chatx2.addVoiceAction({
+              vmdPath: vmdPath,
+              displayName: displayName,
+              type: 'voice',
+              gestureFamily: newGesture || 'general',
+              intent: newIntent || 'general',
+              emotions: emotions,
+              description: newDesc || displayName,
+              dialogueSafe: newSafe
+            });
+          }
+          if (res.success) {
+            close();
+            await loadMotionPacks();
+          } else {
+            alert('保存失败');
+          }
+        } catch (err) {
+          console.error('[chatx2-ext] save voice action failed:', err);
+          alert('保存失败: ' + (err && err.message ? err.message : String(err)));
+        }
+      });
+    }
+
+    function escapeHtml(str) {
+      if (typeof str !== 'string') return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // 搜索框事件绑定（动态面板，暴露 bind 函数供 toggleModelPanel 调用）
+    var _bindVmdSearch = (function() {
+      function bind() {
+        var input = document.getElementById('chatx2-vmd-search');
+        if (!input || input.dataset.bound) return;
+        input.dataset.bound = '1';
+        input.addEventListener('input', function() {
+          _vmdSearchKeyword = input.value.trim();
+          loadMotionPacks();
+        });
+      }
+      if (document.readyState !== 'loading') bind();
+      else document.addEventListener('DOMContentLoaded', bind);
+      return bind;
+    })();
+
+    // 统一事件委托：处理动作库和待机轮换池的所有按钮（动态面板，暴露 bind 函数供 toggleModelPanel 调用）
+    var _bindVmdEvents = (function() {
+      function bind() {
+        // 动作库容器
+        var vmd = document.getElementById('chatx2-vmd');
+        if (vmd && !vmd.dataset.delegated) {
+          vmd.dataset.delegated = '1';
+          vmd.addEventListener('click', async function (e) {
+            var btn = e.target.closest('button');
+            if (!btn || btn.disabled) return;
+            var path = btn.getAttribute('data-path');
+            if (!path) return;
+            e.stopPropagation();
+
+            if (btn.classList.contains('chatx2-vmd-play') || btn.classList.contains('chatx2-vmd-longplay')) {
+              btn.textContent = '...';
+              btn.disabled = true;
+              var previewFailed = false;
+              try {
+                var previewRes;
+                if (btn.classList.contains('chatx2-vmd-longplay')) {
+                  previewRes = await chatx2.previewLongVmd(path);
+                } else {
+                  previewRes = await chatx2.previewCustomVmd(path);
+                }
+                if (previewRes && !previewRes.success) {
+                  previewFailed = true;
+                  btn.textContent = '失败';
+                  btn.title = previewRes.reason || '动作播放失败';
+                  console.warn('[chatx2-ext] preview failed:', previewRes.reason || 'unknown', path);
+                }
+              } catch (err) {
+                previewFailed = true;
+                btn.textContent = '失败';
+                btn.title = err && err.message ? err.message : String(err);
+                console.warn('[chatx2-ext] preview failed:', err);
+              }
+              finally {
+                btn.disabled = false;
+                if (previewFailed) {
+                  setTimeout(function(){ btn.textContent = '播放'; }, 1800);
+                } else {
+                  btn.textContent = '播放';
+                }
+              }
+            } else if (btn.classList.contains('chatx2-vmd-default') && !btn.classList.contains('active')) {
+              btn.textContent = '...';
+              btn.disabled = true;
+              try { var res = await chatx2.setDefaultIdle(path); if (res.success) loadMotionPacks(); } catch (err) { console.error('[chatx2-ext] setDefaultIdle failed:', err); }
+              finally { btn.textContent = '设为默认'; btn.disabled = false; }
+            } else if (btn.classList.contains('chatx2-vmd-idlepool')) {
+              var wasActive = btn.classList.contains('active');
+              btn.disabled = true;
+              try {
+                var res2 = await chatx2.toggleIdleVmd(path, !wasActive);
+                if (res2.success) loadMotionPacks();
+                else if (res2.reason === 'idle-pool-full') alert('最多只能选择 ' + (res2.maxSlots || 4) + ' 个待机动作');
+              } catch (err) { console.error('[chatx2-ext] toggleIdleVmd failed:', err); }
+              finally { btn.disabled = false; }
+            } else if (btn.classList.contains('chatx2-vmd-delete') || btn.classList.contains('chatx2-vmd-longdelete')) {
+              if (!confirm('确定删除动作 "' + path + '" 吗？')) return;
+              btn.textContent = '...';
+              btn.disabled = true;
+              try {
+                var res3;
+                if (btn.classList.contains('chatx2-vmd-longdelete')) {
+                  res3 = await chatx2.removeLongVmd(path);
+                } else {
+                  res3 = await chatx2.removeCustomVmd(path);
+                }
+                if (res3.success) loadMotionPacks();
+              } catch (err) { console.error('[chatx2-ext] remove failed:', err); }
+              finally { btn.textContent = '删除'; btn.disabled = false; }
+            } else if (btn.classList.contains('chatx2-vmd-voice')) {
+              var existingVa = _voiceActionEntries.find(function(e){ return e.vmdPath === path; });
+              openVoiceActionEditor(path, existingVa);
+            }
+          });
+        }
+
+        // 语音动作池容器（展开/折叠 + 播放 + 编辑 + 移除）
+        var voicePool = document.getElementById('chatx2-voice-pool');
+        if (voicePool && !voicePool.dataset.delegated) {
+          voicePool.dataset.delegated = '1';
+          voicePool.addEventListener('click', async function (e) {
+            var header = e.target.closest('.chatx2-voice-group-header');
+            if (header) {
+              var emotion = header.getAttribute('data-emotion');
+              var items = document.getElementById('chatx2-voice-group-' + emotion);
+              var toggle = header.querySelector('.chatx2-voice-toggle');
+              if (items) {
+                var isOpen = items.style.display !== 'none';
+                items.style.display = isOpen ? 'none' : 'block';
+                if (toggle) toggle.textContent = isOpen ? '▶' : '▼';
+              }
+              return;
+            }
+            var btn = e.target.closest('button');
+            if (!btn || btn.disabled) return;
+            var path = btn.getAttribute('data-path');
+            if (!path) return;
+            e.stopPropagation();
+            if (btn.classList.contains('chatx2-voice-play')) {
+              btn.textContent = '...';
+              btn.disabled = true;
+              try {
+                var vmdInfo = _vmdAllItems.find(function(it){ return it.path === path; });
+                if (vmdInfo && vmdInfo.category === 'long') {
+                  await chatx2.previewLongVmd(path);
+                } else {
+                  await chatx2.previewCustomVmd(path);
+                }
+              } catch (err) { console.warn('[chatx2-ext] voice preview failed:', err); }
+              finally { btn.textContent = '播放'; btn.disabled = false; }
+            } else if (btn.classList.contains('chatx2-voice-edit')) {
+              var entry = _voiceActionEntries.find(function(e){ return e.vmdPath === path; });
+              openVoiceActionEditor(path, entry);
+            } else if (btn.classList.contains('chatx2-voice-safe-toggle')) {
+              var safeEntry = _voiceActionEntries.find(function(e){ return e.vmdPath === path; });
+              if (!safeEntry) return;
+              btn.disabled = true;
+              try {
+                var safeResult = await chatx2.updateVoiceAction(path, { dialogueSafe: safeEntry.dialogueSafe !== true });
+                if (safeResult.success) await loadVoiceActions();
+              } catch (err) { console.error('[chatx2-ext] dialogueSafe update failed:', err); }
+              finally { btn.disabled = false; }
+            } else if (btn.classList.contains('chatx2-voice-remove')) {
+              if (!confirm('确定从语音动作池移除该动作吗？')) return;
+              btn.disabled = true;
+              try {
+                var res = await chatx2.removeVoiceAction(path);
+                if (res.success) {
+                  await loadMotionPacks();
+                  await loadVoiceActions();
+                } else {
+                  alert('移除失败：' + (res.reason || '配置未写入'));
+                }
+              } catch (err) {
+                console.error('[chatx2-ext] removeVoiceAction failed:', err);
+                alert('移除失败：' + (err && err.message ? err.message : String(err)));
+              }
+              finally { btn.disabled = false; }
+            }
+          });
+        }
+
+        // 全部展开/收起按钮
+        var voiceExpandBtn = document.getElementById('chatx2-voice-expand');
+        if (voiceExpandBtn && !voiceExpandBtn.dataset.bound) {
+          voiceExpandBtn.dataset.bound = '1';
+          voiceExpandBtn.addEventListener('click', function () {
+            var allItems = document.querySelectorAll('.chatx2-voice-group-items');
+            var allHeaders = document.querySelectorAll('.chatx2-voice-group-header');
+            var allOpen = Array.from(allItems).every(function(el){ return el.style.display !== 'none'; });
+            allItems.forEach(function(el){ el.style.display = allOpen ? 'none' : 'block'; });
+            allHeaders.forEach(function(h){
+              var toggle = h.querySelector('.chatx2-voice-toggle');
+              if (toggle) toggle.textContent = allOpen ? '▶' : '▼';
+            });
+            voiceExpandBtn.textContent = allOpen ? '全部展开' : '全部收起';
+          });
+        }
+
+        // 待机轮换池容器（播放 + 移除）
+        var pool = document.getElementById('chatx2-idle-pool');
+        if (pool && !pool.dataset.delegated) {
+          pool.dataset.delegated = '1';
+          pool.addEventListener('click', async function (e) {
+            var btn = e.target.closest('button');
+            if (!btn || btn.disabled) return;
+            var path = btn.getAttribute('data-path');
+            if (!path) return;
+            e.stopPropagation();
+            if (btn.classList.contains('chatx2-pool-play')) {
+              btn.textContent = '...';
+              btn.disabled = true;
+              try { await chatx2.previewCustomVmd(path); } catch (err) { console.warn('[chatx2-ext] pool preview failed:', err); }
+              finally { btn.textContent = '播放'; btn.disabled = false; }
+            } else if (btn.classList.contains('chatx2-pool-remove')) {
+              btn.disabled = true;
+              try { var res = await chatx2.toggleIdleVmd(path, false); if (res.success) loadMotionPacks(); } catch (err) { console.error('[chatx2-ext] pool remove failed:', err); }
+              finally { btn.disabled = false; }
+            }
+          });
+        }
+      }
+      if (document.readyState !== 'loading') bind();
+      else document.addEventListener('DOMContentLoaded', bind);
+      return bind;
+    })();
+
+    // 加载打光预设
+    async function loadLightingPresets() {
+      try {
+        var result = await chatx2.getLightingPresets();
+        if (!result.success) return;
+        applyLightingStateToSliders(result.dynamic || {});
+        var container = document.getElementById('chatx2-lighting');
+        if (!container) return;
+        container.innerHTML = result.presets.map(function (p) {
+          var isActive = p.id === result.current;
+          var bg = isActive ? '#2a4a5a' : '#2a2d33';
+          var color = isActive ? '#a0d0f0' : '#c0c0c0';
+          var border = isActive ? '#3a6a8a' : '#3a3d43';
+          return '<button class="chatx2-lighting-btn" data-id="' + p.id + '" style="padding:4px 10px;background:' + bg + ';color:' + color + ';border:1px solid ' + border + ';border-radius:4px;cursor:pointer;font-size:11px;">' + p.name + '</button>';
+        }).join('');
+        container.querySelectorAll('.chatx2-lighting-btn').forEach(function (btn) {
+          btn.addEventListener('click', async function () {
+            var id = btn.getAttribute('data-id');
+            try {
+              var res = await chatx2.setLighting(id);
+              if (res.success) loadLightingPresets();
+            } catch (err) {
+              console.error('[chatx2-ext] setLighting failed:', err);
+            }
+          });
+        });
+      } catch (e) {
+        console.error('[chatx2-ext] loadLightingPresets failed:', e);
+      }
+    }
+
+    // 渲染精度切换：切换模型渲染精度
+    async function initRenderQualityButtons() {
+      var container = document.getElementById('chatx2-render-quality');
+      if (!container) return;
+      // 先获取当前精度，更新按钮高亮
+      try {
+        var cur = await chatx2.getRenderQuality();
+        updateQualityButtonHighlight(container, cur.level);
+      } catch (e) {
+        console.warn('[chatx2-ext] getRenderQuality failed:', e);
+      }
+      container.querySelectorAll('.chatx2-quality-btn').forEach(function (btn) {
+        btn.addEventListener('click', async function () {
+          var level = btn.getAttribute('data-level');
+          try {
+            var res = await chatx2.setRenderQuality(level);
+            if (res.success) {
+              updateQualityButtonHighlight(container, level);
+            }
+          } catch (err) {
+            console.error('[chatx2-ext] setRenderQuality failed:', err);
+          }
+        });
+      });
+    }
+    function updateQualityButtonHighlight(container, activeLevel) {
+      container.querySelectorAll('.chatx2-quality-btn').forEach(function (btn) {
+        var isActive = btn.getAttribute('data-level') === activeLevel;
+        btn.style.background = isActive ? '#3a4a5a' : '#2a2d33';
+        btn.style.color = isActive ? '#fff' : '#c0c0c0';
+        btn.style.borderColor = isActive ? '#4a5a6a' : '#3a3d43';
+      });
+    }
+
+    var chatx2ExpressionExpanded = {};
+
+    // 加载表情预设
+    async function loadExpressionPresets() {
+      try {
+        var result = await chatx2.getExpressionPresets();
+        if (!result.success) return;
+        var container = document.getElementById('chatx2-expression');
+        if (!container) return;
+        var count = document.getElementById('chatx2-expression-count');
+        if (count) count.textContent = '(' + result.presets.length + '套)';
+        container.innerHTML = result.presets.map(function (p) {
+          var isActive = result.current === p.id || String(result.current || '').indexOf(p.id + ':') === 0;
+          var supported = p.supported !== false;
+          var supportedChannels = Array.isArray(p.supportedChannels) ? p.supportedChannels : [];
+          var missingChannels = Array.isArray(p.missingChannels) ? p.missingChannels : [];
+          var channels = Array.isArray(p.channels) ? p.channels : [];
+          var expanded = chatx2ExpressionExpanded[p.id] === true;
+          var totalChannels = supportedChannels.length + missingChannels.length;
+          var microCount = Array.isArray(p.microAccents) ? p.microAccents.length : 0;
+          var status = supported
+            ? '语音自动 · 微表情 ' + microCount + ' 种 · 可用 ' + supportedChannels.length + '/' + totalChannels
+            : '当前模型不支持';
+          var title = missingChannels.length ? '缺失通道: ' + missingChannels.join(', ') : '当前模型完整支持';
+          var channelRows = channels.map(function (channel) {
+            var channelActive = result.current === p.id + ':' + channel.id;
+            return '<div style="display:flex;align-items:center;gap:8px;padding:5px 4px 5px 14px;background:#15181e;border-top:1px solid #20242b;">'
+              + '<div style="min-width:0;flex:1;">'
+              +   '<div style="font-size:11px;color:' + (channelActive ? '#e2cff7' : '#c2c5ca') + ';">' + channel.name + '</div>'
+              +   '<div style="font-size:10px;color:#737982;">' + channel.id + ' · 权重 ' + Number(channel.weight || 0).toFixed(3) + '</div>'
+              + '</div>'
+              + '<button class="chatx2-expression-play" data-id="' + p.id + '" data-channel="' + channel.id + '" ' + (channel.supported ? '' : 'disabled')
+              + ' style="padding:3px 9px;background:' + (channelActive ? '#3a2a5a' : '#252932') + ';color:' + (channel.supported ? '#d2d5da' : '#666') + ';border:1px solid ' + (channelActive ? '#7651a0' : '#3a3f49') + ';border-radius:3px;cursor:' + (channel.supported ? 'pointer' : 'not-allowed') + ';font-size:11px;">播放</button>'
+              + '</div>';
+          }).join('');
+          return '<div style="border-bottom:1px solid #252830;">'
+            + '<div style="display:flex;align-items:center;gap:8px;padding:7px 2px;">'
+            +   '<div style="min-width:0;flex:1;">'
+            +     '<div style="font-size:12px;color:' + (isActive ? '#d8c4f0' : '#d0d2d6') + ';">' + p.name + '</div>'
+            +     '<div title="' + title + '" style="font-size:10px;color:' + (supported ? '#7fa68a' : '#8b7373') + ';">' + status + '</div>'
+            +   '</div>'
+            +   '<button class="chatx2-expression-toggle" data-id="' + p.id + '" style="padding:3px 9px;background:#2a2d33;color:#c9cbd0;border:1px solid #3a3d43;border-radius:3px;cursor:pointer;font-size:11px;">' + (expanded ? '收起' : '展开') + '</button>'
+            + '</div>'
+            + '<div style="display:' + (expanded ? 'block' : 'none') + ';">' + channelRows + '</div>'
+            + '</div>';
+        }).join('');
+        container.querySelectorAll('.chatx2-expression-toggle').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var id = btn.getAttribute('data-id');
+            chatx2ExpressionExpanded[id] = !chatx2ExpressionExpanded[id];
+            loadExpressionPresets();
+          });
+        });
+        container.querySelectorAll('.chatx2-expression-play').forEach(function (btn) {
+          btn.addEventListener('click', async function () {
+            var id = btn.getAttribute('data-id');
+            var channel = btn.getAttribute('data-channel');
+            try {
+              var res = await chatx2.setExpression(id, channel);
+              if (res.success) {
+                loadExpressionPresets();
+                setTimeout(loadExpressionPresets, 2300);
+              } else {
+                console.warn('[chatx2-ext] expression preview rejected:', res.reason);
+              }
+            } catch (err) {
+              console.error('[chatx2-ext] setExpression failed:', err);
+            }
+          });
+        });
+      } catch (e) {
+        console.error('[chatx2-ext] loadExpressionPresets failed:', e);
+      }
+    }
+
+    // 监听主进程模式切换事件，同步按钮状态
+    if (chatx2.onModeChange) {
+      chatx2.onModeChange(function (event) {
+        var btn = document.getElementById('btn-chatx2-desktop');
+        if (!btn) return;
+        var isActive = (event && event.to === 'desktop');
+        btn.style.color = isActive ? '#07c160' : '';
+        btn.title = isActive ? '关闭桌宠模式（回到纯聊天）' : '切换到桌宠模式（3D模型 + 迷你输入框）';
+      });
+    }
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "motion": {
+    "minimumDurationSeconds": 1.5,
+    "maximumDurationSeconds": 5,
+    "maximumRootTranslation": 0.08,
+    "maximumCenterTranslation": 0.18,
+    "maximumTurnDegrees": 22,
+    "maximumLegLift": 0.12,
+    "maximumKneeBendDegrees": 38,
+    "maximumHeadEntryDegrees": 8,
+    "maximumShoulderEntryDegrees": 7,
+    "maximumBoneStep": 0.22
+  },
+  "expression": {
+    "minimumDurationSeconds": 1.5,
+    "maximumDurationSeconds": 5,
+    "maximumBlush": 0.35,
+    "maximumEndpointResidual": 0.02,
+    "maximumChannelStep": 0.5
+  }
+}

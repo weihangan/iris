@@ -1,0 +1,11 @@
+{
+  "api": {
+    "provider": "custom",
+    "baseUrl": "",
+    "apiKey": "",
+    "model": "",
+    "capability": "",
+    "reasoning": ""
+  },
+  "notes": "Copy to runtime user data and fill values. Never commit credentials."
+}

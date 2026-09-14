@@ -1,0 +1,15 @@
+{
+  "_comment": "角色情感映射 - 让不同人设面对同一情感时反应不同。修改后立即生效，无需重启。",
+  "_usage": "key = 检测到的情感类型（sad/angry/tired/anxious/happy/excited/question/surprised）；value = TTS 标签（sad/strong/gentle/comfort/shy_happy/excited/question/sad_question）",
+  "_tts_labels": ["sad", "sad_question", "strong", "comfort", "gentle", "question", "shy_happy", "excited"],
+  "emotion_mapping": {
+    "sad": "comfort",
+    "angry": "gentle",
+    "tired": "gentle",
+    "anxious": "comfort",
+    "happy": "shy_happy",
+    "excited": "excited",
+    "question": "question",
+    "surprised": "sad_question"
+  }
+}
