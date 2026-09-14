@@ -8,7 +8,7 @@
 | 目录 | 说明 |
 |------|------|
 | `iris-chat/` | 项目框架 / 基础源码（Electron + Vite + TypeScript，含对话、语音、角色、动作系统） |
-| `Selena-winodws/` | Windows 可直接下载使用的桌面版本（发布包，见 Releases） |
+| `Selena-winodws/` | Windows 桌面版本（发布包）——正在修复 bug，晚些时候上传 |
 
 ## 特性
 
@@ -46,7 +46,7 @@
 
 ## Windows 版本
 
-前往 **Releases** 下载 `v1.0.0` 的 6 个分卷 `.zip`，全部放入同一目录后解压第一个分卷，即可得到完整运行包。
+Windows 桌面版正在修复 bug，晚些时候上传，届时前往 **Releases** 下载 `v1.0.0` 的 6 个分卷 `.zip`，全部放入同一目录后解压第一个分卷，即可得到完整运行包。
 
 ## 框架开发
 
