@@ -1,2 +1,33 @@
 # iris
-iris-chat framework and iris-window portable desktop AI avatar application
+
+桌面 AI 数字人（桌宠）项目。包含两个主目录：
+
+## 目录结构
+
+| 目录 | 说明 |
+|------|------|
+| `iris-chat/` | 项目框架 / 基础源码（Electron + Vite + TypeScript，含对话、语音、角色、动作系统） |
+| `Selena-winodws/` | Windows 可直接下载使用的桌面版本（发布包，见 Releases） |
+
+## 特性
+
+- **API 对话聊天**：接入多种大模型 API（DeepSeek / GLM / Kimi / Qwen / Claude 等）
+- **角色 Skill 蒸馏**：可自主蒸馏网上角色生成 skill，并支持后续微调
+- **有温度的对话**：不是简单一问一答——会联系上下文、会主动询问、会关心用户（如深夜关心、许久没有会话会担心）
+- **语音克隆与输出**：基于 GPT-SoVITS 进行角色语音克隆与语音输出，并支持用户的语音输入
+- **快速响应**：优化生成速度、切分长句，首句输出约 2-4 秒
+- **GPU / CPU 双支持**：可根据硬件自动选择运行环境
+- **模型导入 + 情绪驱动**：可导入模型，对话时按情绪自动匹配动作与表情，也提供待机状态
+- **动作自主导入**：支持自定义动作导入；对动作自动衔接做了优化处理，避免站桩和僵硬
+
+## Windows 版本
+
+前往 **Releases** 下载 `v1.0.0` 的 6 个分卷 `.zip`，全部放入同一目录后解压第一个分卷，即可得到完整运行包。
+
+## 框架开发
+
+```bash
+cd iris-chat
+npm install
+npm run dev
+```
