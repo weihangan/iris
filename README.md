@@ -23,7 +23,7 @@
 - **角色 Skill 蒸馏**：可自主蒸馏网上角色生成 skill，并支持后续微调，越聊越像
 
 <p align="center">
-  <img src="docs/screenshots/chat-image-recognition.png" width="60%" alt="识图聊天与长期记忆" />
+  <img src="docs/screenshots/chat-image-recognition.png" width="45%" alt="识图聊天与长期记忆" />
 </p>
 
 ### 语音：克隆你的角色
@@ -34,8 +34,8 @@
 - **GPU / CPU 双支持**：可根据硬件自动选择运行环境
 
 <p align="center">
-  <img src="docs/screenshots/voice-clone.png" width="48%" alt="语音克隆训练" />
-  <img src="docs/screenshots/voice-switch-language.png" width="48%" alt="切换语言/声音" />
+  <img src="docs/screenshots/voice-clone.png" width="38%" alt="语音克隆训练" />
+  <img src="docs/screenshots/voice-switch-language.png" width="38%" alt="切换语言/声音" />
 </p>
 
 ### 表演：会动的角色
@@ -46,15 +46,15 @@
 - **语音动作联动**：说话时自动匹配口型、表情与肢体动作，让每一句台词都有对应的表演
 
 <p align="center">
-  <img src="docs/screenshots/voice-actions.gif" width="60%" alt="语音动作联动" />
+  <img src="docs/screenshots/voice-actions.gif" width="45%" alt="语音动作联动" />
 </p>
 
 ## 可自由导入切换模型
 
 <p align="center">
-  <img src="docs/screenshots/model-switch-1.png" width="32%" alt="模型切换与动作管理" />
-  <img src="docs/screenshots/model-switch-2.png" width="32%" alt="模型切换与动作管理" />
-  <img src="docs/screenshots/model-switch-3.png" width="32%" alt="模型切换与动作管理" />
+  <img src="docs/screenshots/model-switch-1.png" width="26%" alt="模型切换与动作管理" />
+  <img src="docs/screenshots/model-switch-2.png" width="26%" alt="模型切换与动作管理" />
+  <img src="docs/screenshots/model-switch-3.png" width="26%" alt="模型切换与动作管理" />
 </p>
 
 ## 设置
@@ -62,15 +62,15 @@
 ### 设置功能
 
 <p align="center">
-  <img src="docs/screenshots/settings-1.png" width="48%" alt="设置功能" />
-  <img src="docs/screenshots/settings-2.png" width="48%" alt="设置功能" />
+  <img src="docs/screenshots/settings-1.png" width="38%" alt="设置功能" />
+  <img src="docs/screenshots/settings-2.png" width="38%" alt="设置功能" />
 </p>
 
 ### 语言微调
 
 <p align="center">
-  <img src="docs/screenshots/voice-finetune-1.png" width="48%" alt="语言微调" />
-  <img src="docs/screenshots/voice-finetune-2.png" width="48%" alt="语言微调" />
+  <img src="docs/screenshots/voice-finetune-1.png" width="38%" alt="语言微调" />
+  <img src="docs/screenshots/voice-finetune-2.png" width="38%" alt="语言微调" />
 </p>
 
 ## Windows 版本
