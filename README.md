@@ -22,7 +22,9 @@
 - **记忆自动压缩**：聊天字数达到一定数量会自动压缩历史，同时保留情感线和长期记忆，对话再多也不断片
 - **角色 Skill 蒸馏**：可自主蒸馏网上角色生成 skill，并支持后续微调，越聊越像
 
-![识图聊天与长期记忆](docs/screenshots/chat-image-recognition.png)
+<p align="center">
+  <img src="docs/screenshots/chat-image-recognition.png" width="60%" alt="识图聊天与长期记忆" />
+</p>
 
 ### 语音：克隆你的角色
 
@@ -43,7 +45,9 @@
 - **动作自主导入**：支持自定义动作导入；对动作自动衔接做了优化处理，避免站桩和僵硬
 - **语音动作联动**：说话时自动匹配口型、表情与肢体动作，让每一句台词都有对应的表演
 
-![语音动作联动](docs/screenshots/voice-actions.gif)
+<p align="center">
+  <img src="docs/screenshots/voice-actions.gif" width="60%" alt="语音动作联动" />
+</p>
 
 ## 可自由导入切换模型
 
