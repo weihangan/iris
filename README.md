@@ -3,12 +3,57 @@
 桌面 AI 数字人（桌宠）项目。你的电脑里住着一个会说话、有情绪、记得你的 3D 角色：
 接入大模型 API 聊天，基于 GPT-SoVITS 克隆角色语音，说话时按情绪自动匹配动作与表情。
 
+## 两种获取方式：完整可用版 vs 源码框架
+
+本项目有两个形态，**普通用户直接下载 Selena 完整版就能用**；只有想二次开发、深入了解原理的开发者才需要源码框架。
+
+### 1. Selena-winodws（完整可用版）—— 下载即用
+
+> **✅ 推荐普通用户：不用装任何东西，下载即用**
+>
+> **从这里下载 →** **https://github.com/weihangan/iris/releases/tag/v1.1.0**
+
+Windows 桌面版是**完整可运行**的项目：已经克隆《战双·赛琳娜》的语音、导入其多种角色模型，并内置蒸馏好的赛琳娜 skill（由几十万字符剧情、背景、网络介绍融合而成）。
+
+- 免去装 Python 库、配置环境的所有麻烦，解压后即可启动桌宠
+- 在 **Releases** 页 Assets 区域下载全部 9 个分卷 `Selena-winodws.zip.001~009`，放入同一目录，用 7-Zip 解压第一个分卷即可
+- 需要旧版可下载 `v1.0.0`
+
+### 2. iris-chat（源码框架）—— 需自行配置依赖 + 大模型 API
+
+> **⚠️ 仅面向开发者/二次开发。跑起来需要：按文档用 AI 协助安装 Python 依赖库，并配置大模型 API 密钥。**
+
+`iris-chat/` 是本项目的**基础源码框架**（Electron + Vite + TypeScript，含对话、语音、角色、动作系统）。它**不包含**赛琳娜等现成的语音克隆模型与 skill，需要你自己按 `iris-chat/` 内的 `README-项目介绍.md`、`README-部署指南.md` 操作：
+
+1. `npm install` 安装前端依赖；
+2. 按文档用 AI 下载安装 GPT-SoVITS / ASR 等 **Python 依赖库**（框架本身不含这些运行时）；
+3. 在设置中配置大模型 API（DeepSeek / GLM / Kimi / Qwen / Claude 等）；
+4. 用 `iris-chat/` 内的 skill 蒸馏流程，自己生成角色语音与 skill。
+
+```bash
+cd iris-chat
+npm install
+npm run runtime:install   # 安装 GPT-SoVITS / ASR 运行时（也可手动准备）
+npm run start
+```
+
+### 快速选择
+
+| 你的需求 | 选择 | 下载/操作方式 |
+|---|---|---|
+| 只想直接体验桌宠 | **Selena-winodws** | 到 Releases 下载 v1.1.0 分卷解压 |
+| 想基于它改代码、换角色、深入学习 | **iris-chat** | 按 md 用 AI 装 Python 依赖 + 配模型 API |
+
+---
+
 ## 目录结构
 
 | 目录 | 说明 |
 |------|------|
-| `iris-chat/` | 项目框架 / 基础源码（Electron + Vite + TypeScript，含对话、语音、角色、动作系统） |
-| `Selena-winodws/` | Windows 桌面版本（发布包）：克隆了《战双·赛琳娜》语音并导入其多种模型的完全体项目。赛琳娜的 skill 由项目内部收集的几十万字符剧情、背景、网络介绍融合蒸馏而成 |
+| `iris-chat/` | **源码框架**（Electron + Vite + TS）。需按文档用 AI 下载安装 Python 依赖库并配置大模型 API 才能运行，适合二次开发 |
+| `Selena-winodws/` | **完整可用版**（下载即用）：已克隆《战双·赛琳娜》语音并导入其多模型的成品。下载指引见该目录，或直接去 **Releases** 下载分卷 |
+
+---
 
 ## 特性
 
@@ -93,17 +138,7 @@
 
 - **修复 IPv6 解析延迟**：解决 localhost 被解析为 IPv6 导致每次请求 2 秒静默延迟的问题
 
-## Windows 版本
+## 相关
 
-Windows 桌面版是**完整可运行**的项目（克隆了《战双·赛琳娜》语音、导入了其多种模型，skill 由几十万字符剧情/背景/网络介绍蒸馏而成）。前往 **Releases** 下载 `v1.1.0` 的分卷 `.zip`，全部放入同一目录后解压第一个分卷，即可得到完整运行包（若需旧版可下载 `v1.0.0`）。
-
-## 框架开发
-
-```bash
-cd iris-chat
-npm install
-npm run runtime:install   # 安装 GPT-SoVITS / ASR 运行时（也可手动准备）
-npm run start
-```
-
-详细说明见 `iris-chat/` 内的 `README-项目介绍.md` 与 `README-部署指南.md`。
+- **完整版下载**：https://github.com/weihangan/iris/releases/tag/v1.1.0
+- **源码框架开发文档**：`iris-chat/` 内的 `README-项目介绍.md` 与 `README-部署指南.md`
