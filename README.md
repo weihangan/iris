@@ -1,5 +1,7 @@
 # iris
 
+> **Iris（伊里斯）** 是希腊神话中的彩虹女神，也是奥林匹斯众神的信使。鸢尾花（Iris）成为了她的象征，花语即为「消息」。所以这是一个围绕**「信息 / 对话」**展开的项目：让一个数字生命住进你的电脑，倾听、回应、记住你。
+
 桌面 AI 数字人（桌宠）项目。你的电脑里住着一个会说话、有情绪、记得你的 3D 角色：
 接入大模型 API 聊天，基于 GPT-SoVITS 克隆角色语音，说话时按情绪自动匹配动作与表情。
 
@@ -10,14 +12,21 @@
 ### 1. Selena-winodws（完整可用版）—— 下载即用
 
 > **✅ 推荐普通用户：不用装任何东西，下载即用**
->
-> **从这里下载 →** **https://github.com/weihangan/iris/releases/tag/v1.1.0**
+
+**👉 两个下载通道（任选其一）：**
+
+**方式 A：GitHub Releases**
+> https://github.com/weihangan/iris/releases/tag/v1.1.0
+
+**方式 B：夸克网盘（单包 `Selena-winodws.7z`，8.9GB）**
+> 链接：https://pan.quark.cn/s/7b03330a7b86?pwd=mhJp
+> 提取码：`mhJp`
 
 Windows 桌面版是**完整可运行**的项目：已经克隆《战双·赛琳娜》的语音、导入其多种角色模型，并内置蒸馏好的赛琳娜 skill（由几十万字符剧情、背景、网络介绍融合而成）。
 
 - 免去装 Python 库、配置环境的所有麻烦，解压后即可启动桌宠
 - **仅文字聊天需要接入 API（如 DeepSeek、免费 Agnes 等），消耗 token 极少**，并内置自动压缩与长期记忆，聊得再久也不易遗忘上下文
-- 在 **Releases** 页 Assets 区域下载全部 9 个分卷 `Selena-winodws.zip.001~009`，放入同一目录，用 7-Zip 解压第一个分卷即可
+- GitHub 方式：在 **Releases** 页 Assets 下载全部 9 个分卷 `Selena-winodws.zip.001~009`，同目录用 7-Zip 解压第一个分卷；夸克方式：直接下载单包 `.7z` 解压即可
 - 需要旧版可下载 `v1.0.0`
 
 ### 2. iris-chat（源码框架）—— 需自行配置依赖
@@ -42,7 +51,7 @@ npm run start
 
 | 你的需求 | 选择 | 下载/操作方式 |
 |---|---|---|
-| 只想直接体验桌宠 | **Selena-winodws** | 到 Releases 下载 v1.1.0 分卷解压 |
+| 只想直接体验桌宠 | **Selena-winodws** | GitHub Releases 分卷 或 夸克网盘单包 |
 | 想基于它改代码、换角色、深入学习 | **iris-chat** | 按 md 用 AI 装 Python 依赖 + 配模型 API |
 
 ---
@@ -52,7 +61,7 @@ npm run start
 | 目录 | 说明 |
 |------|------|
 | `iris-chat/` | **源码框架**（Electron + Vite + TS）。需按文档用 AI 下载安装 Python 依赖库并配置大模型 API 才能运行，适合二次开发 |
-| `Selena-winodws/` | **完整可用版**（下载即用）：已克隆《战双·赛琳娜》语音并导入其多模型的成品。下载指引见该目录，或直接去 **Releases** 下载分卷 |
+| `Selena-winodws/` | **完整可用版**（下载即用）：已克隆《战双·赛琳娜》语音并导入其多模型的成品。下载指引见该目录，或直接去 **Releases** / 夸克网盘下载 |
 
 ---
 
@@ -141,5 +150,6 @@ npm run start
 
 ## 相关
 
-- **完整版下载**：https://github.com/weihangan/iris/releases/tag/v1.1.0
+- **完整版下载（GitHub）**：https://github.com/weihangan/iris/releases/tag/v1.1.0
+- **完整版下载（夸克网盘）**：https://pan.quark.cn/s/7b03330a7b86?pwd=mhJp （提取码 `mhJp`）
 - **源码框架开发文档**：`iris-chat/` 内的 `README-项目介绍.md` 与 `README-部署指南.md`
